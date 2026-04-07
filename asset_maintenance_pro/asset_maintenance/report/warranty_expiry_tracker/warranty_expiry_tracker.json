@@ -5,5 +5,20 @@
  "report_type": "Script Report",
  "module": "Asset Maintenance",
  "is_standard": "No",
- "report_script": "def execute(filters=None):\n    filters = filters or {}\n    threshold = int(filters.get(\"expiring_within_days\") or 90)\n    columns = [\n        {\"label\":\"Asset\",\"fieldname\":\"asset\",\"fieldtype\":\"Link\",\"options\":\"Asset\",\"width\":180},\n        {\"label\":\"Asset Name\",\"fieldname\":\"asset_name\",\"fieldtype\":\"Data\",\"width\":160},\n        {\"label\":\"Branch\",\"fieldname\":\"branch\",\"fieldtype\":\"Link\",\"options\":\"Branch\",\"width\":120},\n        {\"label\":\"Category\",\"fieldname\":\"asset_category\",\"fieldtype\":\"Data\",\"width\":130},\n        {\"label\":\"Warranty End\",\"fieldname\":\"warranty_end\",\"fieldtype\":\"Date\",\"width\":120},\n        {\"label\":\"Days Left\",\"fieldname\":\"days_left\",\"fieldtype\":\"Int\",\"width\":100},\n        {\"label\":\"Status\",\"fieldname\":\"warranty_status\",\"fieldtype\":\"Data\",\"width\":120},\n    ]\n\n    rows = frappe.db.sql(\"\"\"\n        SELECT name AS asset, asset_name, branch, asset_category,\n               custom_warranty_end AS warranty_end,\n               DATEDIFF(custom_warranty_end, CURDATE()) AS days_left\n        FROM `tabAsset`\n        WHERE custom_warranty_end IS NOT NULL\n          AND custom_warranty_end >= CURDATE()\n          AND custom_warranty_end <= DATE_ADD(CURDATE(), INTERVAL {t} DAY)\n        ORDER BY warranty_end ASC\n    \"\"\".format(t=threshold), as_dict=True)\n\n    data = []\n    for r in rows:\n        d = r.days_left or 0\n        status = \"< 30 days\" if d < 30 else \"30-60 days\" if d < 60 else \"60-90 days\"\n        data.append({\n            \"asset\": r.asset, \"asset_name\": r.asset_name, \"branch\": r.branch,\n            \"asset_category\": r.asset_category, \"warranty_end\": r.warranty_end,\n            \"days_left\": d, \"warranty_status\": status,\n        })\n    return columns, data\n"
+ "report_script": "def execute(filters=None):\n    filters = filters or {}\n    threshold = int(filters.get(\"expiring_within_days\") or 90)\n    columns = [\n        {\"label\":\"Asset\",\"fieldname\":\"asset\",\"fieldtype\":\"Link\",\"options\":\"Asset\",\"width\":180},\n        {\"label\":\"Asset Name\",\"fieldname\":\"asset_name\",\"fieldtype\":\"Data\",\"width\":160},\n        {\"label\":\"Branch\",\"fieldname\":\"branch\",\"fieldtype\":\"Link\",\"options\":\"Branch\",\"width\":120},\n        {\"label\":\"Category\",\"fieldname\":\"asset_category\",\"fieldtype\":\"Data\",\"width\":130},\n        {\"label\":\"Warranty End\",\"fieldname\":\"warranty_end\",\"fieldtype\":\"Date\",\"width\":120},\n        {\"label\":\"Days Left\",\"fieldname\":\"days_left\",\"fieldtype\":\"Int\",\"width\":100},\n        {\"label\":\"Status\",\"fieldname\":\"warranty_status\",\"fieldtype\":\"Data\",\"width\":120},\n    ]\n\n    rows = frappe.db.sql(\"\"\"\n        SELECT name AS asset, asset_name, branch, asset_category,\n               custom_warranty_end AS warranty_end,\n               DATEDIFF(custom_warranty_end, CURDATE()) AS days_left\n        FROM `tabAsset`\n        WHERE custom_warranty_end IS NOT NULL\n          AND custom_warranty_end >= CURDATE()\n          AND custom_warranty_end <= DATE_ADD(CURDATE(), INTERVAL {t} DAY)\n        ORDER BY warranty_end ASC\n    \"\"\".format(t=threshold), as_dict=True)\n\n    data = []\n    for r in rows:\n        d = r.days_left or 0\n        status = \"< 30 days\" if d < 30 else \"30-60 days\" if d < 60 else \"60-90 days\"\n        data.append({\n            \"asset\": r.asset, \"asset_name\": r.asset_name, \"branch\": r.branch,\n            \"asset_category\": r.asset_category, \"warranty_end\": r.warranty_end,\n            \"days_left\": d, \"warranty_status\": status,\n        })\n    return columns, data\n",
+ "roles": [
+  {
+   "role": "System Manager"
+  },
+  {
+   "role": "Branch Manager"
+  },
+  {
+   "role": "Maintenance Coordinator"
+  },
+  {
+   "role": "Maintenance Technician"
+  }
+ ],
+ "disabled": 0
 }

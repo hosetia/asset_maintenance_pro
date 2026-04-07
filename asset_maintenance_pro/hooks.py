@@ -75,3 +75,8 @@ doctype_js = {
     "Maintenance Work Order": "public/js/maintenance_work_order.js",
     "Asset":                  "public/js/asset_custom.js",
 }
+
+# ── Report fixtures ───────────────────────────────────────────────────────────
+fixtures += [
+    {"dt": "Report", "filters": [["module", "=", "Asset Maintenance"]]},
+]

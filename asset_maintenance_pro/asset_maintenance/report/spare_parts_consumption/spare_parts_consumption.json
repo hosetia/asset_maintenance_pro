@@ -5,5 +5,20 @@
  "report_type": "Script Report",
  "module": "Asset Maintenance",
  "is_standard": "No",
- "report_script": "def execute(filters=None):\n    filters = filters or {}\n    columns = [\n        {\"label\":\"Item\",\"fieldname\":\"item_code\",\"fieldtype\":\"Link\",\"options\":\"Item\",\"width\":160},\n        {\"label\":\"Item Name\",\"fieldname\":\"item_name\",\"fieldtype\":\"Data\",\"width\":180},\n        {\"label\":\"Branch\",\"fieldname\":\"branch\",\"fieldtype\":\"Link\",\"options\":\"Branch\",\"width\":120},\n        {\"label\":\"Asset Category\",\"fieldname\":\"asset_category\",\"fieldtype\":\"Data\",\"width\":140},\n        {\"label\":\"Qty Used\",\"fieldname\":\"total_qty\",\"fieldtype\":\"Float\",\"width\":90},\n        {\"label\":\"Total Amount\",\"fieldname\":\"total_amount\",\"fieldtype\":\"Currency\",\"width\":120},\n        {\"label\":\"Times Used\",\"fieldname\":\"usage_count\",\"fieldtype\":\"Int\",\"width\":100},\n    ]\n\n    branch_filter = \"\"\n    if filters.get(\"branch\"):\n        branch_filter = \"AND mr.branch = %(branch)s\"\n\n    rows = frappe.db.sql(\"\"\"\n        SELECT spc.item_code, spc.item_name,\n               mr.branch, a.asset_category,\n               SUM(spc.qty) AS total_qty,\n               SUM(spc.amount) AS total_amount,\n               COUNT(*) AS usage_count\n        FROM `tabSpare Part Consumption` spc\n        LEFT JOIN `tabMaintenance Request` mr ON mr.name = spc.maintenance_request\n        LEFT JOIN `tabAsset` a ON a.name = mr.asset\n        WHERE 1=1 {f}\n        GROUP BY spc.item_code, mr.branch, a.asset_category\n        ORDER BY total_amount DESC\n    \"\"\".format(f=branch_filter), filters, as_dict=True)\n\n    return columns, [dict(r) for r in rows]\n"
+ "report_script": "def execute(filters=None):\n    filters = filters or {}\n    columns = [\n        {\"label\":\"Item\",\"fieldname\":\"item_code\",\"fieldtype\":\"Link\",\"options\":\"Item\",\"width\":160},\n        {\"label\":\"Item Name\",\"fieldname\":\"item_name\",\"fieldtype\":\"Data\",\"width\":180},\n        {\"label\":\"Branch\",\"fieldname\":\"branch\",\"fieldtype\":\"Link\",\"options\":\"Branch\",\"width\":120},\n        {\"label\":\"Asset Category\",\"fieldname\":\"asset_category\",\"fieldtype\":\"Data\",\"width\":140},\n        {\"label\":\"Qty Used\",\"fieldname\":\"total_qty\",\"fieldtype\":\"Float\",\"width\":90},\n        {\"label\":\"Total Amount\",\"fieldname\":\"total_amount\",\"fieldtype\":\"Currency\",\"width\":120},\n        {\"label\":\"Times Used\",\"fieldname\":\"usage_count\",\"fieldtype\":\"Int\",\"width\":100},\n    ]\n\n    branch_filter = \"\"\n    if filters.get(\"branch\"):\n        branch_filter = \"AND mr.branch = %(branch)s\"\n\n    rows = frappe.db.sql(\"\"\"\n        SELECT spc.item_code, spc.item_name,\n               mr.branch, a.asset_category,\n               SUM(spc.qty) AS total_qty,\n               SUM(spc.amount) AS total_amount,\n               COUNT(*) AS usage_count\n        FROM `tabSpare Part Consumption` spc\n        LEFT JOIN `tabMaintenance Request` mr ON mr.name = spc.maintenance_request\n        LEFT JOIN `tabAsset` a ON a.name = mr.asset\n        WHERE 1=1 {f}\n        GROUP BY spc.item_code, mr.branch, a.asset_category\n        ORDER BY total_amount DESC\n    \"\"\".format(f=branch_filter), filters, as_dict=True)\n\n    return columns, [dict(r) for r in rows]\n",
+ "roles": [
+  {
+   "role": "System Manager"
+  },
+  {
+   "role": "Branch Manager"
+  },
+  {
+   "role": "Maintenance Coordinator"
+  },
+  {
+   "role": "Maintenance Technician"
+  }
+ ],
+ "disabled": 0
 }
