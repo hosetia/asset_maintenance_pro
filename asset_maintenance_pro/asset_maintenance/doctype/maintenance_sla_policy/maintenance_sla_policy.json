@@ -1,0 +1,44 @@
+{
+ "actions": [],
+ "allow_rename": 1,
+ "autoname": "field:policy_name",
+ "naming_rule": "By Fieldname",
+ "creation": "2024-01-01 00:00:00.000000",
+ "doctype": "DocType",
+ "engine": "InnoDB",
+ "field_order": [
+  "policy_name","priority","column_break_1","is_active","maintenance_type",
+  "section_break_times","response_time_hours","resolution_time_hours",
+  "column_break_times","escalation_after_hours","escalate_to","send_sla_breach_alert"
+ ],
+ "fields": [
+  {"fieldname":"policy_name","fieldtype":"Data","label":"Policy Name","reqd":1,"in_list_view":1},
+  {"fieldname":"priority","fieldtype":"Select","label":"Priority","options":"Low\nMedium\nHigh\nCritical","reqd":1,"in_list_view":1,"in_standard_filter":1},
+  {"fieldname":"column_break_1","fieldtype":"Column Break","label":""},
+  {"fieldname":"is_active","fieldtype":"Check","label":"Active","default":"1"},
+  {"fieldname":"maintenance_type","fieldtype":"Select","label":"Maintenance Type","options":"\nCorrective\nPreventive\nPredictive\nInspection"},
+  {"fieldname":"section_break_times","fieldtype":"Section Break","label":"Time Limits"},
+  {"fieldname":"response_time_hours","fieldtype":"Float","label":"Response Time (Hours)","reqd":1,"description":"Time to assign a technician"},
+  {"fieldname":"resolution_time_hours","fieldtype":"Float","label":"Resolution Time (Hours)","reqd":1,"description":"Time to complete the request"},
+  {"fieldname":"column_break_times","fieldtype":"Column Break","label":""},
+  {"fieldname":"escalation_after_hours","fieldtype":"Float","label":"Escalate After (Hours)","description":"Hours after due date to escalate"},
+  {"fieldname":"escalate_to","fieldtype":"Link","label":"Escalate To","options":"User"},
+  {"fieldname":"send_sla_breach_alert","fieldtype":"Check","label":"Send Breach Alert","default":"1"}
+ ],
+ "index_web_pages_for_search": 0,
+ "links": [],
+ "modified": "2024-01-01 00:00:00.000000",
+ "modified_by": "Administrator",
+ "module": "Asset Maintenance",
+ "name": "Maintenance SLA Policy",
+ "owner": "Administrator",
+ "permissions": [
+  {"create":1,"delete":1,"email":1,"export":1,"print":1,"read":1,"report":1,"role":"System Manager","share":1,"write":1},
+  {"create":0,"delete":0,"email":0,"export":1,"print":0,"read":1,"report":1,"role":"Branch Manager","share":0,"write":0}
+ ],
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "states": [],
+ "title_field": "policy_name",
+ "track_changes": 1
+}

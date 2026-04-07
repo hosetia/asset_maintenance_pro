@@ -1,26 +1,22 @@
-"""
-doc_events handlers for external DocTypes (Asset).
-For Maintenance Request events, see the controller class.
-"""
-
+"""doc_events handlers."""
 import frappe
 from frappe import _
 
 
+def on_maintenance_request_insert(doc, method=None):
+    """On new request: auto-set SLA due date, notify."""
+    _set_sla_due_date(doc)
+    from asset_maintenance_pro.asset_maintenance.notifications import send_new_request_notification
+    send_new_request_notification(doc)
+
+
 def on_maintenance_request_update(doc, method=None):
-    """
-    Fired by hooks.py doc_events on Maintenance Request on_update.
-    Secondary hook — used for logging and external integrations.
-    """
-    # REST hook: notify any registered webhooks
-    _fire_status_webhook(doc)
+    """On update: fire webhooks."""
+    pass  # Frappe Webhook DocType handles standard webhooks
 
 
 def on_asset_insert(doc, method=None):
-    """
-    When a new Asset is inserted, check if any Maintenance Checklist
-    applies to its category and log it for the scheduler.
-    """
+    """On new asset: hint about applicable maintenance schedules."""
     if not doc.asset_category:
         return
     checklists = frappe.get_all(
@@ -33,16 +29,23 @@ def on_asset_insert(doc, method=None):
             _("{0} preventive maintenance schedule(s) apply to this asset category.").format(
                 len(checklists)
             ),
-            indicator="blue",
-            alert=True,
+            indicator="blue", alert=True,
         )
 
 
-def _fire_status_webhook(doc):
-    """
-    Generic outbound webhook: POST to any URL registered in
-    'Webhook' DocType with document_type = 'Maintenance Request'.
-    Frappe handles this natively via the Webhook DocType, but this
-    function can be extended for custom integrations.
-    """
-    pass  # Frappe's built-in Webhook DocType handles standard REST webhooks
+def _set_sla_due_date(doc):
+    """Auto-set due_date based on SLA policy if not already set."""
+    if doc.due_date:
+        return
+    try:
+        from asset_maintenance_pro.asset_maintenance.doctype.maintenance_sla_policy.maintenance_sla_policy import get_sla_for_request
+        from frappe.utils import add_to_date
+        policy = get_sla_for_request(doc.priority, doc.maintenance_type)
+        if policy and policy.resolution_time_hours:
+            hours = policy.resolution_time_hours
+            due = add_to_date(doc.creation or frappe.utils.now(),
+                              hours=int(hours))
+            frappe.db.set_value("Maintenance Request", doc.name, "due_date",
+                                frappe.utils.getdate(due))
+    except Exception:
+        pass

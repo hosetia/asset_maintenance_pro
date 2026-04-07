@@ -1,0 +1,53 @@
+{
+ "actions": [],
+ "allow_rename": 1,
+ "autoname": "naming_series:",
+ "naming_rule": "By Naming Series",
+ "creation": "2024-01-01 00:00:00.000000",
+ "doctype": "DocType",
+ "engine": "InnoDB",
+ "field_order": [
+  "naming_series","title","asset_category","maintenance_type","column_break_1",
+  "is_published","views","helpful_votes","section_problem","problem_description",
+  "section_solution","solution","resolution_steps","section_meta",
+  "tags","related_assets","author","published_on"
+ ],
+ "fields": [
+  {"fieldname":"naming_series","fieldtype":"Select","label":"Series","options":"KB-.#####"},
+  {"fieldname":"title","fieldtype":"Data","label":"Title","reqd":1,"in_list_view":1,"search_index":1},
+  {"fieldname":"asset_category","fieldtype":"Link","label":"Asset Category","options":"Asset Category","in_list_view":1,"in_standard_filter":1},
+  {"fieldname":"maintenance_type","fieldtype":"Select","label":"Type","options":"\nCorrective\nPreventive\nInspection","in_standard_filter":1},
+  {"fieldname":"column_break_1","fieldtype":"Column Break","label":""},
+  {"fieldname":"is_published","fieldtype":"Check","label":"Published","default":"1","in_list_view":1},
+  {"fieldname":"views","fieldtype":"Int","label":"Views","read_only":1,"default":"0"},
+  {"fieldname":"helpful_votes","fieldtype":"Int","label":"Helpful Votes","read_only":1,"default":"0"},
+  {"fieldname":"section_problem","fieldtype":"Section Break","label":"Problem"},
+  {"fieldname":"problem_description","fieldtype":"Text Editor","label":"Problem Description","reqd":1},
+  {"fieldname":"section_solution","fieldtype":"Section Break","label":"Solution"},
+  {"fieldname":"solution","fieldtype":"Text Editor","label":"Solution","reqd":1},
+  {"fieldname":"resolution_steps","fieldtype":"Text Editor","label":"Step-by-Step Resolution"},
+  {"fieldname":"section_meta","fieldtype":"Section Break","label":"Meta","collapsible":1},
+  {"fieldname":"tags","fieldtype":"Data","label":"Tags","description":"Comma-separated keywords"},
+  {"fieldname":"related_assets","fieldtype":"Data","label":"Related Asset Categories"},
+  {"fieldname":"author","fieldtype":"Link","label":"Author","options":"User","default":"__user","read_only":1},
+  {"fieldname":"published_on","fieldtype":"Date","label":"Published On","default":"Today"}
+ ],
+ "index_web_pages_for_search": 0,
+ "links": [],
+ "modified": "2024-01-01 00:00:00.000000",
+ "modified_by": "Administrator",
+ "module": "Asset Maintenance",
+ "name": "Maintenance Knowledge Base",
+ "owner": "Administrator",
+ "permissions": [
+  {"create":1,"delete":1,"email":1,"export":1,"print":1,"read":1,"report":1,"role":"System Manager","share":1,"write":1},
+  {"create":1,"delete":0,"email":0,"export":1,"print":1,"read":1,"report":1,"role":"Branch Manager","share":0,"write":1},
+  {"create":0,"delete":0,"email":0,"export":0,"print":1,"read":1,"report":0,"role":"Maintenance Technician","share":0,"write":0}
+ ],
+ "search_fields": "title,asset_category,tags",
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "states": [],
+ "title_field": "title",
+ "track_changes": 1
+}

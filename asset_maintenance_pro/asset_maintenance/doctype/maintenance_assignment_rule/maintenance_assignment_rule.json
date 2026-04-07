@@ -1,0 +1,42 @@
+{
+ "actions": [],
+ "allow_rename": 1,
+ "autoname": "field:rule_name",
+ "naming_rule": "By Fieldname",
+ "creation": "2024-01-01 00:00:00.000000",
+ "doctype": "DocType",
+ "engine": "InnoDB",
+ "field_order": [
+  "rule_name","is_active","priority_order","column_break_1",
+  "maintenance_type","branch","assigned_technician","section_break_load",
+  "max_open_requests","current_load_count"
+ ],
+ "fields": [
+  {"fieldname":"rule_name","fieldtype":"Data","label":"Rule Name","reqd":1,"in_list_view":1},
+  {"fieldname":"is_active","fieldtype":"Check","label":"Active","default":"1","in_list_view":1},
+  {"fieldname":"priority_order","fieldtype":"Int","label":"Priority Order","default":"10","in_list_view":1},
+  {"fieldname":"column_break_1","fieldtype":"Column Break","label":""},
+  {"fieldname":"maintenance_type","fieldtype":"Select","label":"Maintenance Type","options":"\nCorrective\nPreventive\nPredictive\nInspection"},
+  {"fieldname":"branch","fieldtype":"Link","label":"Branch","options":"Branch","in_standard_filter":1},
+  {"fieldname":"assigned_technician","fieldtype":"Link","label":"Assign To","options":"User","reqd":1},
+  {"fieldname":"section_break_load","fieldtype":"Section Break","label":"Load Management"},
+  {"fieldname":"max_open_requests","fieldtype":"Int","label":"Max Open Requests","default":"10"},
+  {"fieldname":"current_load_count","fieldtype":"Int","label":"Current Load","read_only":1}
+ ],
+ "index_web_pages_for_search": 0,
+ "links": [],
+ "modified": "2024-01-01 00:00:00.000000",
+ "modified_by": "Administrator",
+ "module": "Asset Maintenance",
+ "name": "Maintenance Assignment Rule",
+ "owner": "Administrator",
+ "permissions": [
+  {"create":1,"delete":1,"email":0,"export":1,"print":0,"read":1,"report":1,"role":"System Manager","share":1,"write":1},
+  {"create":0,"delete":0,"email":0,"export":0,"print":0,"read":1,"report":0,"role":"Branch Manager","share":0,"write":0}
+ ],
+ "sort_field": "priority_order",
+ "sort_order": "ASC",
+ "states": [],
+ "title_field": "rule_name",
+ "track_changes": 1
+}
