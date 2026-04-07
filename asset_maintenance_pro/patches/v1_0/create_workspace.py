@@ -57,7 +57,6 @@ SHORTCUTS = [
     ("المواقع",          "Maintenance Location",         "DocType", 16, "#28a745"),
     ("قاعدة المعرفة",    "Maintenance Knowledge Base",   "DocType", 17, "#6610f2"),
     ("الأدلة التقنية",   "Maintenance Technical Manual", "DocType", 18, "#fd7e14"),
-    ("BOM الصيانة",      "Maintenance BOM",              "DocType", 19, "#20c997"),
     ("تصنيف الأعطال",   "Asset Taxonomy",               "DocType", 20, "#6c757d"),
 ]
 
@@ -74,7 +73,6 @@ LINKS = [
         {"name":"Maintenance SLA Policy",      "label":"سياسة SLA"},
         {"name":"Maintenance Assignment Rule", "label":"قاعدة التعيين"},
         {"name":"Maintenance Team",            "label":"فريق الصيانة"},
-        {"name":"Maintenance BOM",             "label":"BOM الصيانة"},
         {"name":"Asset Maintenance Settings",  "label":"الإعدادات"},
     ]},
     {"label":"🏢 الامتثال والعقود","items":[
