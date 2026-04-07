@@ -270,10 +270,57 @@ def get_dashboard_data(branch=None, from_date=None, to_date=None):
         as_dict=True
     )
 
+    # Branch completed counts
+    branch_completed = {}
+    for r in all_requests:
+        if r.status == "Completed" and r.branch:
+            branch_completed[r.branch] = branch_completed.get(r.branch, 0) + 1
+
+    # Asset completed counts
+    asset_completed = {}
+    for r in all_requests:
+        if r.status == "Completed" and r.asset:
+            asset_completed[r.asset] = asset_completed.get(r.asset, 0) + 1
+
+    # Top assets with completed
+    top_assets_full = [
+        {"asset": a, "count": c, "completed": asset_completed.get(a, 0)}
+        for a, c in top_assets
+    ]
+
+    # Monthly trend with completed
+    monthly_completed = frappe.db.sql("""
+        SELECT DATE_FORMAT(modified, '%%Y-%%m') AS month, COUNT(*) AS count
+        FROM `tabMaintenance Request`
+        WHERE status = 'Completed'
+          AND modified >= DATE_SUB(NOW(), INTERVAL 6 MONTH)
+        {branch_filter}
+        GROUP BY month ORDER BY month ASC
+    """.format(branch_filter=f"AND branch = {frappe.db.escape(branch)}" if branch else ""),
+        as_dict=True)
+    completed_map = {r.month: r.count for r in monthly_completed}
+    for row in monthly_trend:
+        row["completed"] = completed_map.get(row.month, 0)
+
+    # Overdue list with age
+    overdue_list = frappe.db.sql("""
+        SELECT name, branch, asset, status, priority, assigned_to,
+               DATEDIFF(CURDATE(), DATE(creation)) AS age_days,
+               due_date
+        FROM `tabMaintenance Request`
+        WHERE status IN ('New','Assigned','In Progress','Waiting Parts')
+          AND (due_date < CURDATE() OR DATEDIFF(CURDATE(), DATE(creation)) > 3)
+        {branch_filter}
+        ORDER BY age_days DESC
+        LIMIT 20
+    """.format(branch_filter=f"AND branch = {frappe.db.escape(branch)}" if branch else ""),
+        as_dict=True)
+
     return {
         "status_counts":   status_counts,
         "priority_counts": priority_counts,
         "branch_faults":   branch_faults,
+        "branch_completed": branch_completed,
         "sla": {
             "overdue": overdue_count,
             "at_risk": at_risk_count,
@@ -282,11 +329,12 @@ def get_dashboard_data(branch=None, from_date=None, to_date=None):
                              and r.due_date
                              and date_diff(r.due_date, today()) > 1]),
         },
-        "top_assets":    [{"asset": a, "count": c} for a, c in top_assets],
+        "top_assets":    top_assets_full,
         "tech_load":     [{"user": u, "count": c} for u, c in sorted(tech_load.items(), key=lambda x: x[1], reverse=True)],
         "total_cost":    total_cost,
         "total_requests": len(all_requests),
         "monthly_trend": monthly_trend,
+        "overdue_list":  [dict(r) for r in overdue_list],
     }
 
 

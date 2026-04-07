@@ -1,280 +1,375 @@
 frappe.pages["maintenance-dashboard"].on_page_load = function (wrapper) {
     const page = frappe.ui.make_app_page({
         parent: wrapper,
-        title: "🔧 Maintenance Dashboard",
+        title: "🔧 لوحة تحكم الصيانة",
         single_column: true,
     });
 
-    // ── Filters ──────────────────────────────────────────────────────────────
+    // ── Filters ───────────────────────────────────────────────────────────────
     const branch_field = page.add_field({
-        fieldtype: "Link",
-        fieldname: "branch",
-        options: "Branch",
-        label: "Branch",
-        change() { load_dashboard(); }
+        fieldtype: "Link", fieldname: "branch", options: "Branch",
+        label: "الفرع", change() { load_dashboard(); }
     });
-
     const from_field = page.add_field({
-        fieldtype: "Date",
-        fieldname: "from_date",
-        label: "From",
+        fieldtype: "Date", fieldname: "from_date", label: "من",
         default: frappe.datetime.add_months(frappe.datetime.nowdate(), -1),
         change() { load_dashboard(); }
     });
-
     const to_field = page.add_field({
-        fieldtype: "Date",
-        fieldname: "to_date",
-        label: "To",
+        fieldtype: "Date", fieldname: "to_date", label: "إلى",
         default: frappe.datetime.nowdate(),
         change() { load_dashboard(); }
     });
 
-    page.add_button(__("🔄 Refresh"), () => load_dashboard(), { btn_class: "btn-primary" });
-    page.add_button(__("⬛ Kanban Board"), () =>
-        frappe.set_route("List", "Maintenance Request", "kanban", "Maintenance Kanban"));
-    page.add_button(__("📋 All Requests"), () =>
-        frappe.set_route("List", "Maintenance Request"));
+    page.add_button(__("🔄 تحديث"), () => load_dashboard(), { btn_class: "btn-primary" });
+    page.add_button(__("⬛ Kanban"), () => frappe.set_route("List","Maintenance Request","kanban","Maintenance Kanban"));
+    page.add_button(__("📋 كل الطلبات"), () => frappe.set_route("List","Maintenance Request"));
+    page.add_button(__("➕ طلب جديد"), () => frappe.new_doc("Maintenance Request"));
 
-    // ── Layout ───────────────────────────────────────────────────────────────
+    // ── HTML Layout ───────────────────────────────────────────────────────────
     $(wrapper).find(".page-content").html(`
-        <div id="amp-dashboard" style="padding:20px">
+    <div id="amp-dash" style="padding:16px;direction:rtl">
 
-            <!-- KPI Cards Row -->
-            <div id="amp-kpis" class="row mb-4"></div>
+      <!-- KPI Cards -->
+      <div id="amp-kpis" class="row mb-3"></div>
 
-            <!-- SLA Summary -->
-            <div class="row mb-4">
-                <div class="col-md-4">
-                    <div class="card h-100">
-                        <div class="card-header"><b>⏱️ SLA Status</b></div>
-                        <div class="card-body" id="amp-sla"></div>
-                    </div>
-                </div>
-                <div class="col-md-8">
-                    <div class="card h-100">
-                        <div class="card-header"><b>📈 Monthly Trend</b></div>
-                        <div class="card-body" id="amp-trend"></div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Status + Priority -->
-            <div class="row mb-4">
-                <div class="col-md-6">
-                    <div class="card h-100">
-                        <div class="card-header"><b>📊 Requests by Status</b></div>
-                        <div class="card-body" id="amp-status-chart"></div>
-                    </div>
-                </div>
-                <div class="col-md-6">
-                    <div class="card h-100">
-                        <div class="card-header"><b>🎯 Requests by Priority</b></div>
-                        <div class="card-body" id="amp-priority-chart"></div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Heatmap + Top Assets -->
-            <div class="row mb-4">
-                <div class="col-md-6">
-                    <div class="card h-100">
-                        <div class="card-header"><b>🗺️ Faults Heatmap by Branch</b></div>
-                        <div class="card-body" id="amp-heatmap"></div>
-                    </div>
-                </div>
-                <div class="col-md-6">
-                    <div class="card h-100">
-                        <div class="card-header"><b>⚠️ Top Assets by Faults</b></div>
-                        <div class="card-body" id="amp-top-assets"></div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Technician Load -->
-            <div class="row mb-4">
-                <div class="col-md-12">
-                    <div class="card">
-                        <div class="card-header"><b>👷 Technician Workload</b></div>
-                        <div class="card-body" id="amp-tech-load"></div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Quick Links -->
-            <div class="row mb-4">
-                <div class="col-md-12">
-                    <div class="card">
-                        <div class="card-header"><b>⚡ Quick Actions</b></div>
-                        <div class="card-body">
-                            <div class="row text-center">
-                                ${_quick_link("New Request", "Maintenance Request", "new", "#28a745")}
-                                ${_quick_link("Open Requests", "Maintenance Request", "list?status=New", "#2490ef")}
-                                ${_quick_link("Overdue", "Maintenance Request", "list?status=In Progress", "#e53e3e")}
-                                ${_quick_link("Kanban", "kanban", "", "#805ad5", true)}
-                                ${_quick_link("Knowledge Base", "Maintenance Knowledge Base", "list", "#6610f2")}
-                                ${_quick_link("SLA Policies", "Maintenance SLA Policy", "list", "#e83e8c")}
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
+      <!-- Row 2: Trend + Donut -->
+      <div class="row mb-3">
+        <div class="col-md-7">
+          <div class="amp-card h-100">
+            <div class="amp-card-title">مؤشر طلبات الصيانة خلال الفترة</div>
+            <div id="amp-trend-chart" style="min-height:220px"></div>
+          </div>
         </div>
+        <div class="col-md-5">
+          <div class="amp-card h-100">
+            <div class="amp-card-title">طلبات الصيانة</div>
+            <div id="amp-donut-chart" style="min-height:220px"></div>
+            <div id="amp-donut-legend" class="d-flex flex-wrap justify-content-center mt-2" style="gap:8px"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Row 3: Top Assets + Top Branches -->
+      <div class="row mb-3">
+        <div class="col-md-6">
+          <div class="amp-card h-100">
+            <div class="amp-card-title">الأجهزة الأكثر طلباً للصيانة مقابل اتمام الصيانة</div>
+            <div id="amp-assets-chart" style="min-height:280px"></div>
+          </div>
+        </div>
+        <div class="col-md-6">
+          <div class="amp-card h-100">
+            <div class="amp-card-title">الفروع الأكثر طلباً للصيانة مقابل اتمام الصيانة</div>
+            <div id="amp-branches-chart" style="min-height:280px"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Row 4: SLA + Technician Load -->
+      <div class="row mb-3">
+        <div class="col-md-4">
+          <div class="amp-card h-100">
+            <div class="amp-card-title">⏱️ حالة SLA</div>
+            <div id="amp-sla-bars"></div>
+          </div>
+        </div>
+        <div class="col-md-8">
+          <div class="amp-card h-100">
+            <div class="amp-card-title">👷 عبء الفنيين</div>
+            <div id="amp-tech-chart" style="min-height:200px"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Row 5: Overdue table -->
+      <div class="row mb-3">
+        <div class="col-md-12">
+          <div class="amp-card">
+            <div class="amp-card-title">🚨 الطلبات المتأخرة</div>
+            <div id="amp-overdue-table"></div>
+          </div>
+        </div>
+      </div>
+
+    </div>
     `);
 
-    function _quick_link(label, doctype, action, color, is_kanban = false) {
-        return `<div class="col-md-2 mb-2">
-            <div class="amp-stat-card" style="cursor:pointer;border-top:3px solid ${color}"
-                onclick="${is_kanban
-                    ? "frappe.set_route('List','Maintenance Request','kanban','Maintenance Kanban')"
-                    : `frappe.set_route('List','${doctype}')`
-                }">
-                <div style="font-size:1.5rem">${
-                    {"New Request":"➕","Open Requests":"📋","Overdue":"⚠️",
-                     "Kanban":"⬛","Knowledge Base":"📚","SLA Policies":"⏱️"}[label] || "📌"
-                }</div>
-                <div class="amp-stat-label mt-2">${label}</div>
-            </div>
-        </div>`;
-    }
+    // ── CSS ───────────────────────────────────────────────────────────────────
+    frappe.dom.set_style(`
+        .amp-card {
+            background: #fff;
+            border-radius: 12px;
+            padding: 16px 20px;
+            box-shadow: 0 2px 12px rgba(0,0,0,0.07);
+            border: 1px solid #edf2f7;
+            margin-bottom: 16px;
+        }
+        .amp-card-title {
+            font-weight: 700;
+            font-size: 13px;
+            color: #2d3748;
+            margin-bottom: 14px;
+            padding-bottom: 8px;
+            border-bottom: 1px solid #edf2f7;
+        }
+        .amp-kpi {
+            background: #fff;
+            border-radius: 12px;
+            padding: 18px 20px;
+            box-shadow: 0 2px 12px rgba(0,0,0,0.07);
+            border: 1px solid #edf2f7;
+            margin-bottom: 12px;
+            text-align: center;
+            transition: transform 0.2s;
+            cursor: default;
+        }
+        .amp-kpi:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(0,0,0,0.12); }
+        .amp-kpi-val { font-size: 2.2rem; font-weight: 800; line-height: 1.1; }
+        .amp-kpi-lbl { font-size: 11px; color: #718096; margin-top: 4px; }
+        .amp-bar-row { margin-bottom: 10px; }
+        .amp-bar-label { font-size: 12px; color: #4a5568; margin-bottom: 3px; display:flex; justify-content:space-between; }
+        .amp-bar-track { height: 10px; background: #edf2f7; border-radius: 5px; overflow: hidden; }
+        .amp-bar-fill  { height: 100%; border-radius: 5px; transition: width 0.5s ease; }
+        .amp-legend-dot { width:10px;height:10px;border-radius:50%;display:inline-block;margin-left:4px; }
+        .amp-overdue-table table { width:100%; font-size:13px; border-collapse:collapse; }
+        .amp-overdue-table th { background:#f7fafc;padding:8px 12px;text-align:right;font-weight:600;border-bottom:2px solid #e2e8f0; }
+        .amp-overdue-table td { padding:8px 12px;border-bottom:1px solid #edf2f7; }
+        .amp-overdue-table tr:hover td { background:#f7fafc; }
+        .amp-badge { display:inline-block;padding:2px 8px;border-radius:10px;font-size:11px;font-weight:600; }
+        .amp-stars { color:#f6ad55; font-size:14px; }
+    `);
 
     // ── Load Dashboard ────────────────────────────────────────────────────────
     function load_dashboard() {
-        const branch    = branch_field.get_value();
+        const branch   = branch_field.get_value();
         const from_date = from_field.get_value();
         const to_date   = to_field.get_value();
 
+        $("#amp-kpis").html(_skeleton(5, "col-md-2-4"));
         frappe.call({
             method: "asset_maintenance_pro.api.get_dashboard_data",
             args: { branch, from_date, to_date },
-            freeze: true,
-            freeze_message: __("Loading Dashboard..."),
             callback(r) {
                 if (!r.message) return;
                 const d = r.message;
                 _render_kpis(d);
-                _render_sla(d.sla);
-                _render_status_chart(d.status_counts);
-                _render_priority_chart(d.priority_counts);
-                _render_heatmap(d.branch_faults);
-                _render_top_assets(d.top_assets);
-                _render_tech_load(d.tech_load);
                 _render_trend(d.monthly_trend);
+                _render_donut(d.status_counts);
+                _render_assets_chart(d.top_assets);
+                _render_branches_chart(d.branch_faults, d.branch_completed);
+                _render_sla(d.sla);
+                _render_tech(d.tech_load);
+                _render_overdue(d.overdue_list);
             }
         });
     }
 
     // ── KPI Cards ─────────────────────────────────────────────────────────────
     function _render_kpis(d) {
-        const open = (d.status_counts["New"] || 0) +
-                     (d.status_counts["Assigned"] || 0) +
-                     (d.status_counts["In Progress"] || 0) +
-                     (d.status_counts["Waiting Parts"] || 0) +
-                     (d.status_counts["Awaiting Close"] || 0);
+        const open = (d.status_counts["New"]||0)+(d.status_counts["Assigned"]||0)+
+                     (d.status_counts["In Progress"]||0)+(d.status_counts["Waiting Parts"]||0)+
+                     (d.status_counts["Awaiting Close"]||0);
 
         const kpis = [
-            { label: "Total Requests",  value: d.total_requests,                 color: "#2490ef", icon: "📋" },
-            { label: "Open",            value: open,                              color: "#ff8c00", icon: "🔓" },
-            { label: "Completed",       value: d.status_counts["Completed"] || 0, color: "#38a169", icon: "✅" },
-            { label: "Overdue",         value: d.sla.overdue,                     color: "#e53e3e", icon: "⚠️" },
-            { label: "At Risk (SLA)",   value: d.sla.at_risk,                     color: "#805ad5", icon: "⏰" },
-            { label: "Total Cost",      value: `${frappe.format(d.total_cost, {fieldtype:"Currency"})}`, color: "#17a2b8", icon: "💰" },
+            { val: d.sla.overdue,                   lbl:"طلبات لم تأخذ إجراء\nلأكثر من 3 أيام", color:"#e53e3e", bg:"#fff5f5" },
+            { val: d.total_requests,                 lbl:"الأجهزة - الكل",          color:"#2490ef", bg:"#ebf8ff" },
+            { val: open,                             lbl:"الأجهزة - تم تعيينه لي",  color:"#d69e2e", bg:"#fffff0" },
+            { val: d.total_requests,                 lbl:"اجمالي طلبات الصيانه",    color:"#38a169", bg:"#f0fff4" },
+            { val: Object.keys(d.branch_faults||{}).length, lbl:"اجمالي الفروع",   color:"#6f42c1", bg:"#faf5ff" },
         ];
 
         $("#amp-kpis").html(kpis.map(k => `
-            <div class="col-md-2 mb-3">
-                <div class="amp-stat-card" style="border-top:4px solid ${k.color}">
-                    <div style="font-size:1.8rem">${k.icon}</div>
-                    <div class="amp-stat-number" style="color:${k.color}">${k.value}</div>
-                    <div class="amp-stat-label">${k.label}</div>
+            <div class="col" style="padding:0 6px">
+                <div class="amp-kpi" style="border-top:4px solid ${k.color};background:${k.bg}">
+                    <div class="amp-kpi-val" style="color:${k.color}">${k.val}</div>
+                    <div class="amp-kpi-lbl">${k.lbl.replace("\n","<br>")}</div>
                 </div>
             </div>
         `).join(""));
     }
 
-    // ── SLA ───────────────────────────────────────────────────────────────────
+    // ── Trend Chart ───────────────────────────────────────────────────────────
+    function _render_trend(trend) {
+        if (!trend || !trend.length) { $("#amp-trend-chart").html(_no_data()); return; }
+        new frappe.Chart("#amp-trend-chart", {
+            type: "line",
+            data: {
+                labels: trend.map(t => t.month),
+                datasets: [
+                    { name:"طلبات الصيانة", values: trend.map(t => t.count), chartType:"line" },
+                    { name:"تم الحل",        values: trend.map(t => t.completed || 0), chartType:"line" },
+                ]
+            },
+            colors: ["#e53e3e","#38a169"],
+            height: 220,
+            lineOptions: { hideDots: 0, regionFill: 0 },
+            axisOptions: { xIsSeries: true },
+        });
+    }
+
+    // ── Donut Chart ───────────────────────────────────────────────────────────
+    function _render_donut(counts) {
+        const color_map = {
+            "New":"#e53e3e","Assigned":"#f6ad55","In Progress":"#f6e05e",
+            "Waiting Parts":"#fc8181","Awaiting Close":"#9f7aea",
+            "Completed":"#68d391","Cancelled":"#a0aec0"
+        };
+        const label_map = {
+            "New":"جديدة","Assigned":"مخصصة","In Progress":"جارية",
+            "Waiting Parts":"انتظار قطع","Awaiting Close":"انتظار إغلاق",
+            "Completed":"تم الحل","Cancelled":"ملغاة"
+        };
+
+        const entries = Object.entries(counts).filter(([k,v]) => v > 0);
+        if (!entries.length) { $("#amp-donut-chart").html(_no_data()); return; }
+
+        const labels = entries.map(([k]) => label_map[k] || k);
+        const values = entries.map(([k,v]) => v);
+        const colors = entries.map(([k]) => color_map[k] || "#a0aec0");
+
+        new frappe.Chart("#amp-donut-chart", {
+            type: "donut",
+            data: { labels, datasets: [{ values }] },
+            colors,
+            height: 200,
+        });
+
+        // Legend
+        $("#amp-donut-legend").html(entries.map(([k,v]) => `
+            <span style="font-size:12px;font-weight:600;background:${color_map[k]}22;
+                         color:${color_map[k]};padding:3px 10px;border-radius:20px">
+                ${label_map[k]||k}: ${v}
+            </span>
+        `).join(""));
+    }
+
+    // ── Assets Chart (horizontal bar: total vs completed) ─────────────────────
+    function _render_assets_chart(assets) {
+        if (!assets || !assets.length) { $("#amp-assets-chart").html(_no_data()); return; }
+        const top10 = assets.slice(0, 10);
+        const max   = top10[0].count;
+
+        $("#amp-assets-chart").html(top10.map(a => `
+            <div class="amp-bar-row">
+                <div class="amp-bar-label">
+                    <span>${a.asset}</span><span>${a.count}</span>
+                </div>
+                <div style="display:flex;align-items:center;gap:4px">
+                    <div class="amp-bar-track" style="flex:1">
+                        <div class="amp-bar-fill" style="width:${a.count/max*100}%;background:#e53e3e"></div>
+                    </div>
+                    <div class="amp-bar-track" style="width:${(a.completed||0)/max*100+10}%">
+                        <div class="amp-bar-fill" style="width:100%;background:#38a169"></div>
+                    </div>
+                </div>
+            </div>
+        `).join("") + `
+            <div style="display:flex;gap:16px;margin-top:10px;font-size:11px">
+                <span><span class="amp-legend-dot" style="background:#e53e3e"></span> اجمالي طلبات الصيانة</span>
+                <span><span class="amp-legend-dot" style="background:#38a169"></span> تم الحل</span>
+            </div>
+        `);
+    }
+
+    // ── Branches Chart ────────────────────────────────────────────────────────
+    function _render_branches_chart(branch_faults, branch_completed) {
+        const faults    = Object.entries(branch_faults || {}).sort((a,b) => b[1]-a[1]).slice(0,15);
+        const completed = branch_completed || {};
+        if (!faults.length) { $("#amp-branches-chart").html(_no_data()); return; }
+        const max = faults[0][1];
+
+        $("#amp-branches-chart").html(faults.map(([b,cnt]) => {
+            const comp = completed[b] || 0;
+            return `
+                <div class="amp-bar-row">
+                    <div class="amp-bar-label"><span>${b}</span><span>${cnt}</span></div>
+                    <div style="display:flex;align-items:center;gap:4px">
+                        <div class="amp-bar-track" style="flex:1">
+                            <div class="amp-bar-fill" style="width:${cnt/max*100}%;background:#e53e3e"></div>
+                        </div>
+                        <div class="amp-bar-track" style="width:${comp/max*100+5}%">
+                            <div class="amp-bar-fill" style="width:100%;background:#68d391"></div>
+                        </div>
+                    </div>
+                </div>`;
+        }).join("") + `
+            <div style="display:flex;gap:16px;margin-top:10px;font-size:11px">
+                <span><span class="amp-legend-dot" style="background:#e53e3e"></span> اجمالي طلبات الصيانة</span>
+                <span><span class="amp-legend-dot" style="background:#68d391"></span> تم الحل</span>
+            </div>
+        `);
+    }
+
+    // ── SLA Bars ──────────────────────────────────────────────────────────────
     function _render_sla(sla) {
-        const total = (sla.overdue || 0) + (sla.at_risk || 0) + (sla.on_track || 0);
-        if (!total) { $("#amp-sla").html("<p class='text-muted'>No open requests</p>"); return; }
-
+        const total = (sla.on_track||0) + (sla.at_risk||0) + (sla.overdue||0) || 1;
         const items = [
-            { label: "✅ On Track",  count: sla.on_track, color: "#38a169", pct: Math.round(sla.on_track/total*100) },
-            { label: "⏰ At Risk",   count: sla.at_risk,  color: "#ff8c00", pct: Math.round(sla.at_risk/total*100) },
-            { label: "🚨 Breached",  count: sla.overdue,  color: "#e53e3e", pct: Math.round(sla.overdue/total*100) },
+            { label:"✅ في الوقت",   count: sla.on_track, color:"#38a169" },
+            { label:"⚠️ في خطر",    count: sla.at_risk,  color:"#d69e2e" },
+            { label:"🚨 متأخر",      count: sla.overdue,  color:"#e53e3e" },
         ];
-
-        $("#amp-sla").html(items.map(item => `
-            <div class="mb-3">
-                <div class="d-flex justify-content-between mb-1">
+        $("#amp-sla-bars").html(items.map(item => `
+            <div class="amp-bar-row">
+                <div class="amp-bar-label">
                     <span>${item.label}</span>
                     <b style="color:${item.color}">${item.count}</b>
                 </div>
-                <div class="amp-progress">
-                    <div class="amp-progress-bar" style="width:${item.pct}%;background:${item.color}"></div>
+                <div class="amp-bar-track">
+                    <div class="amp-bar-fill" style="width:${Math.round((item.count||0)/total*100)}%;background:${item.color}"></div>
                 </div>
             </div>
         `).join(""));
     }
 
-    // ── Status Chart ──────────────────────────────────────────────────────────
-    function _render_status_chart(counts) {
-        if (!Object.keys(counts).length) { $("#amp-status-chart").html("<p class='text-muted'>No data</p>"); return; }
-        const colors = { "New":"#2490ef","Assigned":"#ff8c00","In Progress":"#f0b429",
-                         "Waiting Parts":"#e53e3e","Awaiting Close":"#805ad5","Completed":"#38a169","Cancelled":"#a0aec0" };
-        const labels = Object.keys(counts);
-        const values = Object.values(counts);
-
-        new frappe.Chart("#amp-status-chart", {
-            type: "bar",
-            data: {
-                labels,
-                datasets: [{ values, chartType: "bar" }]
-            },
-            colors: labels.map(l => colors[l] || "#a0aec0"),
-            height: 200,
-            axisOptions: { xIsSeries: false },
-            tooltipOptions: { formatTooltipX: d => d, formatTooltipY: d => `${d} requests` },
-        });
+    // ── Technician Load ───────────────────────────────────────────────────────
+    function _render_tech(techs) {
+        if (!techs || !techs.length) { $("#amp-tech-chart").html(_no_data()); return; }
+        const max = techs[0].count || 1;
+        $("#amp-tech-chart").html(`<div class="row">${
+            techs.map(t => {
+                const pct   = Math.round(t.count / max * 100);
+                const color = pct > 80 ? "#e53e3e" : pct > 60 ? "#d69e2e" : "#38a169";
+                return `<div class="col-md-4 mb-3">
+                    <div class="amp-bar-label"><span>👷 ${t.user}</span><b>${t.count} مفتوح</b></div>
+                    <div class="amp-bar-track">
+                        <div class="amp-bar-fill" style="width:${pct}%;background:${color}"></div>
+                    </div>
+                </div>`;
+            }).join("")
+        }</div>`);
     }
 
-    // ── Priority Chart ────────────────────────────────────────────────────────
-    function _render_priority_chart(counts) {
-        if (!Object.keys(counts).length) { $("#amp-priority-chart").html("<p class='text-muted'>No data</p>"); return; }
-        const colors = { "Low":"#38a169","Medium":"#f0b429","High":"#ff8c00","Critical":"#e53e3e" };
-        const order  = ["Critical","High","Medium","Low"];
-        const labels = order.filter(k => counts[k]);
-        const values = labels.map(k => counts[k]);
-
-        new frappe.Chart("#amp-priority-chart", {
-            type: "pie",
-            data: { labels, datasets: [{ values }] },
-            colors: labels.map(l => colors[l] || "#a0aec0"),
-            height: 200,
-        });
-    }
-
-    // ── Heatmap ───────────────────────────────────────────────────────────────
-    function _render_heatmap(branch_faults) {
-        const entries = Object.entries(branch_faults).sort((a, b) => b[1] - a[1]);
-        if (!entries.length) { $("#amp-heatmap").html("<p class='text-muted'>No data</p>"); return; }
-        const max = Math.max(...entries.map(e => e[1]));
-
-        $("#amp-heatmap").html(`
-            <div class="table-responsive">
-                <table class="table table-sm">
-                    <thead><tr><th>Branch</th><th>Faults</th><th>Heat</th></tr></thead>
+    // ── Overdue Table ─────────────────────────────────────────────────────────
+    function _render_overdue(list) {
+        if (!list || !list.length) {
+            $("#amp-overdue-table").html(`<p class="text-muted text-center py-3">✅ لا توجد طلبات متأخرة</p>`);
+            return;
+        }
+        $("#amp-overdue-table").html(`
+            <div class="amp-overdue-table">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>رقم الطلب</th><th>الفرع</th><th>الجهاز</th>
+                            <th>الحالة</th><th>الأولوية</th><th>متأخر منذ</th>
+                            <th>مخصص لـ</th><th>تقييم العمل</th>
+                        </tr>
+                    </thead>
                     <tbody>
-                        ${entries.map(([branch, count]) => {
-                            const pct  = Math.round(count / max * 100);
-                            const heat = pct > 75 ? "#e53e3e" : pct > 50 ? "#ff8c00" : pct > 25 ? "#f0b429" : "#38a169";
+                        ${list.map(r => {
+                            const age     = r.age_days || 0;
+                            const pri_col = r.priority === "Critical" ? "#e53e3e" : r.priority === "High" ? "#d69e2e" : "#4a5568";
+                            const stars   = "★".repeat(r.rating||0) + "☆".repeat(5-(r.rating||0));
                             return `<tr>
-                                <td>${branch}</td>
-                                <td><b>${count}</b></td>
-                                <td>
-                                    <div class="amp-progress" style="width:120px">
-                                        <div class="amp-progress-bar" style="width:${pct}%;background:${heat}"></div>
-                                    </div>
-                                </td>
+                                <td><a href="/app/maintenance-request/${r.name}" target="_blank">${r.name}</a></td>
+                                <td>${r.branch||"-"}</td>
+                                <td>${r.asset||"-"}</td>
+                                <td><span class="amp-badge" style="background:#fed7d7;color:#c53030">${r.status}</span></td>
+                                <td><b style="color:${pri_col}">${r.priority||"-"}</b></td>
+                                <td style="color:#e53e3e;font-weight:700">متأخر منذ: ${age} يوم</td>
+                                <td>${r.assigned_to||"غير مخصص"}</td>
+                                <td><span class="amp-stars">${stars}</span></td>
                             </tr>`;
                         }).join("")}
                     </tbody>
@@ -283,69 +378,12 @@ frappe.pages["maintenance-dashboard"].on_page_load = function (wrapper) {
         `);
     }
 
-    // ── Top Assets ────────────────────────────────────────────────────────────
-    function _render_top_assets(assets) {
-        if (!assets || !assets.length) { $("#amp-top-assets").html("<p class='text-muted'>No data</p>"); return; }
-        const max = assets[0].count;
-
-        $("#amp-top-assets").html(`
-            ${assets.map((a, i) => {
-                const pct  = Math.round(a.count / max * 100);
-                const medal = i === 0 ? "🥇" : i === 1 ? "🥈" : i === 2 ? "🥉" : "  ";
-                return `<div class="mb-2">
-                    <div class="d-flex justify-content-between">
-                        <span>${medal} <a href="#" onclick="frappe.set_route('List','Maintenance Request',{asset:'${a.asset}'})">${a.asset}</a></span>
-                        <b>${a.count}</b>
-                    </div>
-                    <div class="amp-progress">
-                        <div class="amp-progress-bar" style="width:${pct}%"></div>
-                    </div>
-                </div>`;
-            }).join("")}
-        `);
+    function _no_data() { return `<p class="text-muted text-center py-4" style="font-size:13px">لا توجد بيانات</p>`; }
+    function _skeleton(n, cls) {
+        return Array(n).fill(`<div class="${cls||'col-md-2'}" style="padding:0 6px">
+            <div style="height:90px;background:#f0f0f0;border-radius:12px;animation:pulse 1.5s infinite"></div>
+        </div>`).join("");
     }
 
-    // ── Technician Load ───────────────────────────────────────────────────────
-    function _render_tech_load(techs) {
-        if (!techs || !techs.length) { $("#amp-tech-load").html("<p class='text-muted'>No open assignments</p>"); return; }
-        const max = techs[0].count;
-
-        $("#amp-tech-load").html(`
-            <div class="row">
-                ${techs.map(t => {
-                    const pct   = Math.round(t.count / Math.max(max, 10) * 100);
-                    const color = pct > 80 ? "#e53e3e" : pct > 60 ? "#ff8c00" : "#38a169";
-                    return `<div class="col-md-4 mb-3">
-                        <div class="d-flex justify-content-between mb-1">
-                            <span>👷 ${t.user}</span>
-                            <b style="color:${color}">${t.count} open</b>
-                        </div>
-                        <div class="amp-progress">
-                            <div class="amp-progress-bar" style="width:${pct}%;background:${color}"></div>
-                        </div>
-                    </div>`;
-                }).join("")}
-            </div>
-        `);
-    }
-
-    // ── Monthly Trend ─────────────────────────────────────────────────────────
-    function _render_trend(trend) {
-        if (!trend || !trend.length) { $("#amp-trend").html("<p class='text-muted'>No data</p>"); return; }
-
-        new frappe.Chart("#amp-trend", {
-            type: "line",
-            data: {
-                labels: trend.map(t => t.month),
-                datasets: [{ name: "Requests", values: trend.map(t => t.count), chartType: "line" }]
-            },
-            colors: ["#2490ef"],
-            height: 200,
-            lineOptions: { hideDots: 0, regionFill: 1 },
-            axisOptions: { xIsSeries: true },
-        });
-    }
-
-    // ── Initial Load ──────────────────────────────────────────────────────────
     load_dashboard();
 };
