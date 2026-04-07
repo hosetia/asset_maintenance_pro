@@ -47,7 +47,7 @@ CONTENT = json.dumps([
 SHORTCUTS = [
     # Quick actions (row 1)
     ("طلب صيانة جديد",  "Maintenance Request",          "DocType", 1,  "#28a745"),
-    ("لوحة التحكم",      "Maintenance Request",          "DocType", 2,  "#6f42c1"),
+    ("لوحة التحكم",      "/app/maintenance-dashboard",   "URL",     2,  "#6f42c1"),
     ("Kanban",           "Maintenance Request",          "DocType", 3,  "#2490EF"),
     ("تقرير دوري",       "Maintenance Request",          "DocType", 4,  "#20c997"),
     ("تحليل TCO",        "Asset",                        "DocType", 5,  "#e83e8c"),
@@ -133,9 +133,19 @@ def execute():
         if "shortcuts" in field_names:
             sc_meta   = frappe.get_meta("Workspace Shortcut")
             sc_fields = {f.fieldname for f in sc_meta.fields}
+            valid_types = []
+            type_field = sc_meta.get_field("type")
+            if type_field and type_field.options:
+                valid_types = [o.strip() for o in type_field.options.split("\n") if o.strip()]
             for label, link_to, stype, idx, color in SHORTCUTS:
+                # If URL type not supported, use DocType fallback
+                if valid_types and stype not in valid_types:
+                    if stype == "URL":
+                        stype = "DocType"
+                        link_to = "Maintenance Request"
                 row = {"label": label, "link_to": link_to, "type": stype, "idx": idx}
                 if "color" in sc_fields: row["color"] = color
+                if "url" in sc_fields and stype == "URL": row["url"] = link_to
                 ws.append("shortcuts", row)
 
         if "links" in field_names:
