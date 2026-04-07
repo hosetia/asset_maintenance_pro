@@ -1,0 +1,179 @@
+{
+ "actions": [],
+ "allow_rename": 0,
+ "creation": "2024-01-01 00:00:00.000000",
+ "doctype": "DocType",
+ "engine": "InnoDB",
+ "field_order": [
+  "section_notifications",
+  "enable_email_notifications",
+  "enable_inapp_notifications",
+  "enable_sms_notifications",
+  "sms_api_url",
+  "sms_api_key",
+  "sms_api_secret",
+  "sms_from_number",
+  "column_break_notif",
+  "notify_on_new_request",
+  "notify_on_status_change",
+  "notify_on_overdue",
+  "overdue_threshold_days",
+  "section_stock",
+  "default_warehouse",
+  "auto_create_stock_entry",
+  "column_break_stock",
+  "stock_entry_type",
+  "section_scheduler",
+  "enable_preventive_scheduler",
+  "scheduler_lookahead_days"
+ ],
+ "fields": [
+  {
+   "fieldname": "section_notifications",
+   "fieldtype": "Section Break",
+   "label": "Notification Settings"
+  },
+  {
+   "fieldname": "enable_email_notifications",
+   "fieldtype": "Check",
+   "default": "1",
+   "label": "Enable Email Notifications"
+  },
+  {
+   "fieldname": "enable_inapp_notifications",
+   "fieldtype": "Check",
+   "default": "1",
+   "label": "Enable In-App Notifications"
+  },
+  {
+   "fieldname": "enable_sms_notifications",
+   "fieldtype": "Check",
+   "default": "0",
+   "label": "Enable SMS Notifications"
+  },
+  {
+   "fieldname": "sms_api_url",
+   "fieldtype": "Data",
+   "label": "SMS API URL",
+   "depends_on": "eval:doc.enable_sms_notifications==1"
+  },
+  {
+   "fieldname": "sms_api_key",
+   "fieldtype": "Data",
+   "label": "SMS API Key",
+   "depends_on": "eval:doc.enable_sms_notifications==1"
+  },
+  {
+   "fieldname": "sms_api_secret",
+   "fieldtype": "Password",
+   "label": "SMS API Secret",
+   "depends_on": "eval:doc.enable_sms_notifications==1"
+  },
+  {
+   "fieldname": "sms_from_number",
+   "fieldtype": "Data",
+   "label": "From Number / Sender ID",
+   "depends_on": "eval:doc.enable_sms_notifications==1"
+  },
+  {
+   "fieldname": "column_break_notif",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "notify_on_new_request",
+   "fieldtype": "Check",
+   "default": "1",
+   "label": "Notify on New Request"
+  },
+  {
+   "fieldname": "notify_on_status_change",
+   "fieldtype": "Check",
+   "default": "1",
+   "label": "Notify on Status Change"
+  },
+  {
+   "fieldname": "notify_on_overdue",
+   "fieldtype": "Check",
+   "default": "1",
+   "label": "Notify on Overdue Requests"
+  },
+  {
+   "fieldname": "overdue_threshold_days",
+   "fieldtype": "Int",
+   "default": "3",
+   "label": "Overdue Threshold (Days)",
+   "depends_on": "eval:doc.notify_on_overdue==1"
+  },
+  {
+   "fieldname": "section_stock",
+   "fieldtype": "Section Break",
+   "label": "Stock Settings"
+  },
+  {
+   "fieldname": "default_warehouse",
+   "fieldtype": "Link",
+   "label": "Default Warehouse",
+   "options": "Warehouse"
+  },
+  {
+   "fieldname": "auto_create_stock_entry",
+   "fieldtype": "Check",
+   "default": "1",
+   "label": "Auto-create Stock Entry on Completion"
+  },
+  {
+   "fieldname": "column_break_stock",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "stock_entry_type",
+   "fieldtype": "Select",
+   "label": "Stock Entry Type",
+   "options": "Material Issue\nMaterial Transfer",
+   "default": "Material Issue"
+  },
+  {
+   "fieldname": "section_scheduler",
+   "fieldtype": "Section Break",
+   "label": "Preventive Maintenance Scheduler"
+  },
+  {
+   "fieldname": "enable_preventive_scheduler",
+   "fieldtype": "Check",
+   "default": "1",
+   "label": "Enable Preventive Maintenance Scheduler"
+  },
+  {
+   "fieldname": "scheduler_lookahead_days",
+   "fieldtype": "Int",
+   "default": "7",
+   "label": "Scheduler Look-ahead (Days)",
+   "description": "Generate requests this many days in advance"
+  }
+ ],
+ "index_web_pages_for_search": 0,
+ "issingle": 1,
+ "links": [],
+ "modified": "2024-01-01 00:00:00.000000",
+ "modified_by": "Administrator",
+ "module": "Asset Maintenance",
+ "name": "Asset Maintenance Settings",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "create": 1,
+   "delete": 0,
+   "email": 0,
+   "export": 0,
+   "print": 0,
+   "read": 1,
+   "report": 0,
+   "role": "System Manager",
+   "share": 0,
+   "write": 1
+  }
+ ],
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "states": []
+}

@@ -1,0 +1,2 @@
+[post_model_sync]
+asset_maintenance_pro.patches.v1_0.create_default_settings

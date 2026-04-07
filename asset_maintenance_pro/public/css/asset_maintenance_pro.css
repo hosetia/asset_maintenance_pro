@@ -1,0 +1,48 @@
+/* Asset Maintenance Pro — Custom Styles */
+
+/* Priority badge colors in list view */
+.dt-cell [data-fieldname="priority"] .filterable[data-label="Critical"] {
+    background-color: #ff5858;
+    color: #fff;
+    padding: 2px 6px;
+    border-radius: 4px;
+    font-weight: 600;
+}
+.dt-cell [data-fieldname="priority"] .filterable[data-label="High"] {
+    background-color: #ff8c00;
+    color: #fff;
+    padding: 2px 6px;
+    border-radius: 4px;
+}
+
+/* Kanban column header colors */
+.kanban-column[data-column-value="New"] .kanban-column-header {
+    border-top: 3px solid #5e64ff;
+}
+.kanban-column[data-column-value="Assigned"] .kanban-column-header {
+    border-top: 3px solid #ff8c00;
+}
+.kanban-column[data-column-value="In Progress"] .kanban-column-header {
+    border-top: 3px solid #f0b429;
+}
+.kanban-column[data-column-value="Waiting Parts"] .kanban-column-header {
+    border-top: 3px solid #e53e3e;
+}
+.kanban-column[data-column-value="Awaiting Close"] .kanban-column-header {
+    border-top: 3px solid #805ad5;
+}
+.kanban-column[data-column-value="Completed"] .kanban-column-header {
+    border-top: 3px solid #38a169;
+}
+
+/* Overdue highlight */
+.list-row[data-name] .list-subject .overdue-badge {
+    display: inline-block;
+    background: #e53e3e;
+    color: #fff;
+    border-radius: 3px;
+    padding: 1px 5px;
+    font-size: 10px;
+    margin-left: 6px;
+    vertical-align: middle;
+}

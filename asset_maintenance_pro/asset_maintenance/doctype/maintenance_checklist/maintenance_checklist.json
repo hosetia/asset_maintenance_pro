@@ -1,0 +1,177 @@
+{
+ "actions": [],
+ "allow_rename": 1,
+ "autoname": "naming_series:",
+ "naming_rule": "By Naming Series",
+ "creation": "2024-01-01 00:00:00.000000",
+ "doctype": "DocType",
+ "engine": "InnoDB",
+ "field_order": [
+  "naming_series",
+  "title",
+  "asset_category",
+  "column_break_1",
+  "is_active",
+  "maintenance_type",
+  "section_break_trigger",
+  "trigger_type",
+  "maintenance_interval_days",
+  "meter_threshold",
+  "meter_uom",
+  "column_break_trigger2",
+  "last_generated_date",
+  "last_generated_meter_value",
+  "advance_notice_days",
+  "section_break_tasks",
+  "tasks"
+ ],
+ "fields": [
+  {
+   "fieldname": "naming_series",
+   "fieldtype": "Select",
+   "label": "Series",
+   "options": "MCL-.#####",
+   "reqd": 1
+  },
+  {
+   "fieldname": "title",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "label": "Checklist Title",
+   "reqd": 1
+  },
+  {
+   "fieldname": "asset_category",
+   "fieldtype": "Link",
+   "in_list_view": 1,
+   "in_standard_filter": 1,
+   "label": "Asset Category",
+   "options": "Asset Category"
+  },
+  {
+   "fieldname": "column_break_1",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "is_active",
+   "fieldtype": "Check",
+   "default": "1",
+   "in_list_view": 1,
+   "label": "Active"
+  },
+  {
+   "fieldname": "maintenance_type",
+   "fieldtype": "Select",
+   "label": "Maintenance Type",
+   "options": "Preventive\nInspection\nPredictive",
+   "default": "Preventive",
+   "reqd": 1
+  },
+  {
+   "fieldname": "section_break_trigger",
+   "fieldtype": "Section Break",
+   "label": "Scheduling Trigger"
+  },
+  {
+   "fieldname": "trigger_type",
+   "fieldtype": "Select",
+   "label": "Trigger Type",
+   "options": "Calendar (Days)\nMeter Reading\nBoth (whichever comes first)",
+   "default": "Calendar (Days)",
+   "reqd": 1
+  },
+  {
+   "fieldname": "maintenance_interval_days",
+   "fieldtype": "Int",
+   "label": "Interval (Days)",
+   "description": "Generate a new request every N days",
+   "depends_on": "eval:doc.trigger_type!='Meter Reading'"
+  },
+  {
+   "fieldname": "meter_threshold",
+   "fieldtype": "Float",
+   "label": "Meter Threshold",
+   "description": "Generate a request every N meter units",
+   "depends_on": "eval:doc.trigger_type!='Calendar (Days)'"
+  },
+  {
+   "fieldname": "meter_uom",
+   "fieldtype": "Link",
+   "label": "Meter UOM",
+   "options": "UOM",
+   "depends_on": "eval:doc.trigger_type!='Calendar (Days)'"
+  },
+  {
+   "fieldname": "column_break_trigger2",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "last_generated_date",
+   "fieldtype": "Date",
+   "label": "Last Generated Date",
+   "read_only": 1
+  },
+  {
+   "fieldname": "last_generated_meter_value",
+   "fieldtype": "Float",
+   "label": "Last Generated Meter Value",
+   "read_only": 1
+  },
+  {
+   "fieldname": "advance_notice_days",
+   "fieldtype": "Int",
+   "label": "Advance Notice (Days)",
+   "default": "3",
+   "description": "Create request N days before the due date"
+  },
+  {
+   "fieldname": "section_break_tasks",
+   "fieldtype": "Section Break",
+   "label": "Tasks"
+  },
+  {
+   "fieldname": "tasks",
+   "fieldtype": "Table",
+   "label": "Tasks",
+   "options": "Maintenance Request Checklist Item"
+  }
+ ],
+ "index_web_pages_for_search": 0,
+ "links": [],
+ "modified": "2024-01-01 00:00:00.000000",
+ "modified_by": "Administrator",
+ "module": "Asset Maintenance",
+ "name": "Maintenance Checklist",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "System Manager",
+   "share": 1,
+   "write": 1
+  },
+  {
+   "create": 1,
+   "delete": 0,
+   "email": 0,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "Branch Manager",
+   "share": 0,
+   "write": 1
+  }
+ ],
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "states": [],
+ "title_field": "title",
+ "track_changes": 1
+}

@@ -1,0 +1,299 @@
+{
+ "actions": [],
+ "allow_rename": 0,
+ "autoname": "naming_series:",
+ "naming_rule": "By Naming Series",
+ "creation": "2024-01-01 00:00:00.000000",
+ "doctype": "DocType",
+ "engine": "InnoDB",
+ "field_order": [
+  "naming_series",
+  "asset",
+  "branch",
+  "maintenance_type",
+  "priority",
+  "column_break_1",
+  "status",
+  "kanban_column",
+  "assigned_to",
+  "due_date",
+  "section_break_description",
+  "description",
+  "section_break_images",
+  "images",
+  "section_break_checklist",
+  "checklist",
+  "section_break_completion",
+  "total_cost",
+  "completion_image",
+  "completion_notes",
+  "section_break_meta",
+  "request_type",
+  "reference_meter_reading",
+  "preventive_schedule",
+  "column_break_meta2",
+  "requested_by",
+  "requested_on",
+  "closed_by",
+  "closed_on"
+ ],
+ "fields": [
+  {
+   "fieldname": "naming_series",
+   "fieldtype": "Select",
+   "label": "Series",
+   "options": "MNT-.YYYY.-.#####",
+   "reqd": 1
+  },
+  {
+   "fieldname": "asset",
+   "fieldtype": "Link",
+   "in_list_view": 1,
+   "in_standard_filter": 1,
+   "label": "Asset",
+   "options": "Asset",
+   "reqd": 1,
+   "search_index": 1
+  },
+  {
+   "fieldname": "branch",
+   "fieldtype": "Link",
+   "in_list_view": 1,
+   "in_standard_filter": 1,
+   "label": "Branch",
+   "options": "Branch",
+   "reqd": 1,
+   "search_index": 1,
+   "fetch_from": "asset.branch",
+   "fetch_if_empty": 1
+  },
+  {
+   "fieldname": "maintenance_type",
+   "fieldtype": "Select",
+   "in_list_view": 1,
+   "label": "Maintenance Type",
+   "options": "\nCorrective\nPreventive\nPredictive\nInspection",
+   "reqd": 1
+  },
+  {
+   "fieldname": "priority",
+   "fieldtype": "Select",
+   "in_list_view": 1,
+   "label": "Priority",
+   "options": "Low\nMedium\nHigh\nCritical",
+   "default": "Medium"
+  },
+  {
+   "fieldname": "column_break_1",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "status",
+   "fieldtype": "Select",
+   "in_list_view": 1,
+   "in_standard_filter": 1,
+   "label": "Status",
+   "options": "New\nAssigned\nIn Progress\nWaiting Parts\nAwaiting Close\nCompleted\nCancelled",
+   "default": "New",
+   "reqd": 1,
+   "search_index": 1
+  },
+  {
+   "fieldname": "kanban_column",
+   "fieldtype": "Select",
+   "label": "Kanban Column",
+   "options": "New\nAssigned\nIn Progress\nWaiting Parts\nAwaiting Close\nCompleted",
+   "default": "New",
+   "hidden": 1
+  },
+  {
+   "fieldname": "assigned_to",
+   "fieldtype": "Link",
+   "in_list_view": 1,
+   "in_standard_filter": 1,
+   "label": "Assigned To",
+   "options": "User",
+   "search_index": 1
+  },
+  {
+   "fieldname": "due_date",
+   "fieldtype": "Date",
+   "in_list_view": 1,
+   "label": "Due Date"
+  },
+  {
+   "fieldname": "section_break_description",
+   "fieldtype": "Section Break",
+   "label": "Description"
+  },
+  {
+   "fieldname": "description",
+   "fieldtype": "Text Editor",
+   "label": "Problem Description",
+   "reqd": 1
+  },
+  {
+   "fieldname": "section_break_images",
+   "fieldtype": "Section Break",
+   "label": "Images"
+  },
+  {
+   "fieldname": "images",
+   "fieldtype": "Table",
+   "label": "Images",
+   "options": "Maintenance Request Image"
+  },
+  {
+   "fieldname": "section_break_checklist",
+   "fieldtype": "Section Break",
+   "label": "Checklist"
+  },
+  {
+   "fieldname": "checklist",
+   "fieldtype": "Table",
+   "label": "Checklist",
+   "options": "Maintenance Request Checklist Item"
+  },
+  {
+   "fieldname": "section_break_completion",
+   "fieldtype": "Section Break",
+   "label": "Completion Details"
+  },
+  {
+   "fieldname": "total_cost",
+   "fieldtype": "Currency",
+   "label": "Total Cost",
+   "allow_on_submit": 0
+  },
+  {
+   "fieldname": "completion_image",
+   "fieldtype": "Attach Image",
+   "label": "Completion Image"
+  },
+  {
+   "fieldname": "completion_notes",
+   "fieldtype": "Text Editor",
+   "label": "Completion Notes"
+  },
+  {
+   "fieldname": "section_break_meta",
+   "fieldtype": "Section Break",
+   "label": "Additional Information",
+   "collapsible": 1
+  },
+  {
+   "fieldname": "request_type",
+   "fieldtype": "Select",
+   "label": "Request Type",
+   "options": "Manual\nPreventive (Auto-generated)",
+   "default": "Manual",
+   "read_only": 1
+  },
+  {
+   "fieldname": "reference_meter_reading",
+   "fieldtype": "Link",
+   "label": "Reference Meter Reading",
+   "options": "Asset Meter Reading",
+   "depends_on": "eval:doc.request_type=='Preventive (Auto-generated)'"
+  },
+  {
+   "fieldname": "preventive_schedule",
+   "fieldtype": "Link",
+   "label": "Preventive Schedule",
+   "options": "Maintenance Checklist",
+   "depends_on": "eval:doc.request_type=='Preventive (Auto-generated)'"
+  },
+  {
+   "fieldname": "column_break_meta2",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "requested_by",
+   "fieldtype": "Link",
+   "label": "Requested By",
+   "options": "User",
+   "default": "__user",
+   "read_only": 1
+  },
+  {
+   "fieldname": "requested_on",
+   "fieldtype": "Datetime",
+   "label": "Requested On",
+   "default": "Now",
+   "read_only": 1
+  },
+  {
+   "fieldname": "closed_by",
+   "fieldtype": "Link",
+   "label": "Closed By",
+   "options": "User",
+   "read_only": 1
+  },
+  {
+   "fieldname": "closed_on",
+   "fieldtype": "Datetime",
+   "label": "Closed On",
+   "read_only": 1
+  }
+ ],
+ "index_web_pages_for_search": 0,
+ "links": [],
+ "modified": "2024-01-01 00:00:00.000000",
+ "modified_by": "Administrator",
+ "module": "Asset Maintenance",
+ "name": "Maintenance Request",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "create": 1,
+   "delete": 0,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "Branch Manager",
+   "share": 1,
+   "write": 1
+  },
+  {
+   "create": 0,
+   "delete": 0,
+   "email": 1,
+   "export": 0,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "Maintenance Technician",
+   "share": 0,
+   "write": 1
+  },
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "System Manager",
+   "share": 1,
+   "write": 1
+  }
+ ],
+ "search_fields": "asset,branch,status,assigned_to",
+ "show_title_field_in_link": 1,
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "states": [
+  {"color": "Blue", "title": "New"},
+  {"color": "Orange", "title": "Assigned"},
+  {"color": "Yellow", "title": "In Progress"},
+  {"color": "Red", "title": "Waiting Parts"},
+  {"color": "Purple", "title": "Awaiting Close"},
+  {"color": "Green", "title": "Completed"},
+  {"color": "Gray", "title": "Cancelled"}
+ ],
+ "title_field": "name",
+ "track_changes": 1
+}

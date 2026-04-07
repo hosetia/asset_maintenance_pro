@@ -1,0 +1,61 @@
+[
+ {
+  "name": "Asset-custom_maintenance_tab",
+  "dt": "Asset",
+  "module": "Asset Maintenance",
+  "fieldname": "custom_maintenance_tab",
+  "fieldtype": "Tab Break",
+  "label": "Maintenance",
+  "insert_after": "purchase_date"
+ },
+ {
+  "name": "Asset-custom_last_maintenance_date",
+  "dt": "Asset",
+  "module": "Asset Maintenance",
+  "fieldname": "custom_last_maintenance_date",
+  "fieldtype": "Date",
+  "label": "Last Maintenance Date",
+  "insert_after": "custom_maintenance_tab",
+  "read_only": 1,
+  "in_list_view": 0
+ },
+ {
+  "name": "Asset-custom_maintenance_interval_days",
+  "dt": "Asset",
+  "module": "Asset Maintenance",
+  "fieldname": "custom_maintenance_interval_days",
+  "fieldtype": "Int",
+  "label": "Maintenance Interval (Days)",
+  "insert_after": "custom_last_maintenance_date",
+  "description": "Override checklist interval for this specific asset"
+ },
+ {
+  "name": "Asset-custom_meter_threshold",
+  "dt": "Asset",
+  "module": "Asset Maintenance",
+  "fieldname": "custom_meter_threshold",
+  "fieldtype": "Float",
+  "label": "Meter Threshold (Override)",
+  "insert_after": "custom_maintenance_interval_days"
+ },
+ {
+  "name": "Asset-custom_current_meter_value",
+  "dt": "Asset",
+  "module": "Asset Maintenance",
+  "fieldname": "custom_current_meter_value",
+  "fieldtype": "Float",
+  "label": "Current Meter Value",
+  "insert_after": "custom_meter_threshold",
+  "read_only": 1
+ },
+ {
+  "name": "Asset-custom_meter_uom",
+  "dt": "Asset",
+  "module": "Asset Maintenance",
+  "fieldname": "custom_meter_uom",
+  "fieldtype": "Link",
+  "label": "Meter UOM",
+  "options": "UOM",
+  "insert_after": "custom_current_meter_value"
+ }
+]
