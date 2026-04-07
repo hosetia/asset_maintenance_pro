@@ -1,0 +1,73 @@
+[
+ {
+  "doctype": "Workspace",
+  "name": "Asset Maintenance Pro",
+  "title": "Asset Maintenance",
+  "module": "Asset Maintenance",
+  "category": "Modules",
+  "icon": "tool",
+  "color": "#2490EF",
+  "is_standard": 0,
+  "public": 1,
+  "roles": [],
+  "shortcuts": [
+   {
+    "doctype": "Shortcut",
+    "label": "Maintenance Request",
+    "link_to": "Maintenance Request",
+    "type": "DocType",
+    "color": "#2490EF",
+    "icon": "tool"
+   },
+   {
+    "doctype": "Shortcut",
+    "label": "New Request",
+    "link_to": "Maintenance Request",
+    "type": "DocType",
+    "color": "#28a745",
+    "icon": "add"
+   },
+   {
+    "doctype": "Shortcut",
+    "label": "Maintenance Checklist",
+    "link_to": "Maintenance Checklist",
+    "type": "DocType",
+    "color": "#6f42c1",
+    "icon": "list"
+   },
+   {
+    "doctype": "Shortcut",
+    "label": "Work Logs",
+    "link_to": "Maintenance Work Log",
+    "type": "DocType",
+    "color": "#fd7e14",
+    "icon": "file"
+   },
+   {
+    "doctype": "Shortcut",
+    "label": "Spare Parts",
+    "link_to": "Spare Part Consumption",
+    "type": "DocType",
+    "color": "#dc3545",
+    "icon": "stock"
+   },
+   {
+    "doctype": "Shortcut",
+    "label": "Meter Readings",
+    "link_to": "Asset Meter Reading",
+    "type": "DocType",
+    "color": "#17a2b8",
+    "icon": "dashboard"
+   },
+   {
+    "doctype": "Shortcut",
+    "label": "Settings",
+    "link_to": "Asset Maintenance Settings",
+    "type": "DocType",
+    "color": "#6c757d",
+    "icon": "setting"
+   }
+  ],
+  "content": "[{\"type\":\"onboarding\",\"data\":{\"onboarding_name\":\"Asset Maintenance\",\"col\":12}},{\"type\":\"spacer\",\"data\":{\"col\":12}},{\"type\":\"header\",\"data\":{\"text\":\"<h3>Quick Access<\\/h3>\",\"col\":12}},{\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Maintenance Request\",\"col\":4}},{\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"New Request\",\"col\":4}},{\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Maintenance Checklist\",\"col\":4}},{\"type\":\"spacer\",\"data\":{\"col\":12}},{\"type\":\"header\",\"data\":{\"text\":\"<h3>Operations<\\/h3>\",\"col\":12}},{\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Work Logs\",\"col\":4}},{\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Spare Parts\",\"col\":4}},{\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Meter Readings\",\"col\":4}},{\"type\":\"spacer\",\"data\":{\"col\":12}},{\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Settings\",\"col\":4}}]"
+ }
+]

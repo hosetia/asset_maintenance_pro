@@ -132,6 +132,11 @@ function _add_action_buttons(frm) {
         frm.add_custom_button(__("Add Work Log"), () => _quick_work_log(frm));
     }
 
+    // Kanban Board
+    frm.add_custom_button(__("Kanban Board"), () => {
+        frappe.set_route("Kanban", "Maintenance Request", "Maintenance Kanban");
+    }, __("View"));
+
     // View Work Logs
     frm.add_custom_button(__("Work Logs"), () => {
         frappe.set_route("List", "Maintenance Work Log", {
