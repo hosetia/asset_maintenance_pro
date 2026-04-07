@@ -34,22 +34,22 @@ LINKS = [
     {
         "label": "Maintenance",
         "items": [
-            {"type": "DocType", "name": "Maintenance Request",       "label": "Maintenance Request"},
-            {"type": "DocType", "name": "Maintenance Work Log",      "label": "Work Log"},
-            {"type": "DocType", "name": "Spare Part Consumption",    "label": "Spare Parts"},
+            {"type": "Link", "name": "Maintenance Request",       "label": "Maintenance Request"},
+            {"type": "Link", "name": "Maintenance Work Log",      "label": "Work Log"},
+            {"type": "Link", "name": "Spare Part Consumption",    "label": "Spare Parts"},
         ]
     },
     {
         "label": "Configuration",
         "items": [
-            {"type": "DocType", "name": "Maintenance Checklist",      "label": "Maintenance Checklist"},
-            {"type": "DocType", "name": "Asset Maintenance Settings", "label": "Settings"},
+            {"type": "Link", "name": "Maintenance Checklist",      "label": "Maintenance Checklist"},
+            {"type": "Link", "name": "Asset Maintenance Settings", "label": "Settings"},
         ]
     },
     {
         "label": "Readings",
         "items": [
-            {"type": "DocType", "name": "Asset Meter Reading", "label": "Meter Reading"},
+            {"type": "Link", "name": "Asset Meter Reading", "label": "Meter Reading"},
         ]
     },
 ]
@@ -96,7 +96,7 @@ def execute():
                     "type": "Card Break", "label": group["label"], "hidden": 0,
                 })
                 for item in group["items"]:
-                    row = {"type": item["type"], "hidden": 0}
+                    row = {"type": "Link", "hidden": 0}
                     if "link_to" in lk_fields: row["link_to"] = item["name"]
                     if "label"   in lk_fields: row["label"]   = item.get("label", item["name"])
                     ws.append("links", row)
