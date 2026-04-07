@@ -232,3 +232,34 @@ def _send_sms(user, message_text, settings):
             )
     except Exception:
         frappe.log_error(frappe.get_traceback(), "SMS Notification Failed")
+
+
+def send_completion_notification(doc):
+    """Send completion notification with duration info."""
+    settings = _settings()
+    recipients = _get_recipients(doc, include_managers=True)
+    if not recipients:
+        return
+
+    duration = getattr(doc, "completion_duration_hours", 0) or 0
+    subject = f"✅ طلب الصيانة {doc.name} اكتمل في {duration} ساعة"
+    message = f"""
+    <div dir="rtl" style="font-family:Arial;font-size:14px">
+        <p>تم إنجاز طلب الصيانة بنجاح.</p>
+        <table style="border-collapse:collapse;width:100%">
+            <tr><td style="padding:6px;font-weight:bold">رقم الطلب:</td><td>{doc.name}</td></tr>
+            <tr><td style="padding:6px;font-weight:bold">الجهاز:</td><td>{doc.asset}</td></tr>
+            <tr><td style="padding:6px;font-weight:bold">الفرع:</td><td>{doc.branch}</td></tr>
+            <tr><td style="padding:6px;font-weight:bold">مدة الإنجاز:</td><td style="color:#38a169;font-weight:bold">{duration} ساعة</td></tr>
+            <tr><td style="padding:6px;font-weight:bold">التكلفة الإجمالية:</td><td>{doc.total_cost or 0} ريال</td></tr>
+        </table>
+        <p><a href="{get_url_to_form('Maintenance Request', doc.name)}">عرض الطلب</a></p>
+    </div>
+    """
+    for user in recipients:
+        if settings.enable_inapp_notifications:
+            _send_inapp(user, subject, message, doc)
+        if settings.enable_email_notifications:
+            _send_email(user, subject, message)
+        if settings.enable_sms_notifications:
+            _send_sms(user, subject, settings)

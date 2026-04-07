@@ -236,6 +236,43 @@
    "fieldtype": "Datetime",
    "label": "Closed On",
    "read_only": 1
+  },
+  {
+   "fieldname": "section_break_asset_info",
+   "fieldtype": "Section Break",
+   "label": "معلومات الجهاز",
+   "insert_after": "branch",
+   "collapsible": 0
+  },
+  {
+   "fieldname": "asset_info_html",
+   "fieldtype": "HTML",
+   "label": "Asset Info",
+   "insert_after": "section_break_asset_info",
+   "options": ""
+  },
+  {
+   "fieldname": "warranty_status",
+   "fieldtype": "Select",
+   "label": "حالة الضمان",
+   "options": "\nضمان ساري\nضمان منتهي\nلا يوجد ضمان",
+   "insert_after": "asset_info_html",
+   "read_only": 1,
+   "in_list_view": 0
+  },
+  {
+   "fieldname": "completion_duration_hours",
+   "fieldtype": "Float",
+   "label": "مدة الإنجاز (ساعات)",
+   "insert_after": "closed_on",
+   "read_only": 1
+  },
+  {
+   "fieldname": "previous_requests_count",
+   "fieldtype": "Int",
+   "label": "طلبات الصيانة السابقة",
+   "insert_after": "completion_duration_hours",
+   "read_only": 1
   }
  ],
  "index_web_pages_for_search": 0,
@@ -355,5 +392,6 @@
   }
  ],
  "title_field": "name",
- "track_changes": 1
+ "track_changes": 1,
+ "allow_comments": 1
 }

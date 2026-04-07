@@ -175,11 +175,18 @@ def get_request_summary(name):
         is_overdue = days_left < 0
         sla_status = "Breached" if days_left < 0 else "At Risk" if days_left <= 1 else "On Track"
 
+    # Previous requests for this asset
+    previous_count = 0
+    if doc.asset:
+        previous_count = frappe.db.count("Maintenance Request",
+            {"asset": doc.asset, "name": ["!=", doc.name]})
+
     return {
-        "work_log_count":  work_log_count,
+        "work_log_count":   work_log_count,
         "spare_part_count": spare_part_count,
-        "is_overdue":      is_overdue,
-        "sla_status":      sla_status,
+        "is_overdue":       is_overdue,
+        "sla_status":       sla_status,
+        "previous_count":   previous_count,
     }
 
 
@@ -516,3 +523,50 @@ def mark_kb_helpful(name):
     frappe.db.set_value("Maintenance Knowledge Base", name, "helpful_votes", current + 1)
     frappe.db.commit()
     return {"helpful_votes": current + 1}
+
+
+@frappe.whitelist()
+def get_asset_full_details(asset):
+    """Return comprehensive asset details for the maintenance request card."""
+    doc = frappe.get_doc("Asset", asset)
+
+    # Warranty status
+    warranty_end = frappe.db.get_value("Asset", asset, "custom_warranty_end")
+    if warranty_end:
+        days_left = date_diff(warranty_end, today())
+        warranty_status = "ضمان ساري" if days_left >= 0 else "ضمان منتهي"
+    else:
+        warranty_status = "لا يوجد ضمان"
+
+    # Last maintenance
+    last_maintenance = frappe.db.get_value(
+        "Maintenance Request",
+        {"asset": asset, "status": "Completed"},
+        "modified",
+        order_by="modified desc",
+    )
+
+    # Previous requests count
+    previous_count = frappe.db.count("Maintenance Request", {"asset": asset})
+
+    # Location
+    location = frappe.db.get_value("Asset", asset, "custom_location")
+
+    return {
+        "asset":                  asset,
+        "asset_name":             doc.asset_name,
+        "asset_category":         doc.asset_category,
+        "branch":                 frappe.db.get_value("Asset", asset, "branch"),
+        "location":               location,
+        "serial_no":              getattr(doc, "serial_no", None),
+        "manufacturer":           getattr(doc, "manufacturer", None),
+        "model":                  getattr(doc, "asset_name", None),
+        "warranty_end":           str(warranty_end) if warranty_end else None,
+        "warranty_status":        warranty_status,
+        "last_maintenance":       str(last_maintenance) if last_maintenance else None,
+        "previous_requests_count": previous_count,
+        "criticality":            frappe.db.get_value("Asset", asset, "custom_criticality"),
+        "custom_last_maintenance_date": frappe.db.get_value("Asset", asset, "custom_last_maintenance_date"),
+        "custom_mttr_hours":      frappe.db.get_value("Asset", asset, "custom_mttr_hours"),
+        "custom_mtbf_days":       frappe.db.get_value("Asset", asset, "custom_mtbf_days"),
+    }

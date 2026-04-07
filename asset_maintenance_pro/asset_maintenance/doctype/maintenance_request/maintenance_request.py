@@ -119,12 +119,20 @@ class MaintenanceRequest(Document):
 
     def _handle_status_change(self, old_status):
         if self.status == "Completed":
+            closed_on = now()
+            # Calculate completion duration
+            duration_hours = 0
+            if self.requested_on:
+                from frappe.utils import time_diff_in_hours
+                duration_hours = round(time_diff_in_hours(closed_on, self.requested_on), 1)
             frappe.db.set_value(self.doctype, self.name, {
                 "closed_by": frappe.session.user,
-                "closed_on": now(),
+                "closed_on": closed_on,
+                "completion_duration_hours": duration_hours,
             })
             self._update_asset_last_maintenance_date()
             self._create_stock_entry_for_spare_parts()
+            self._send_completion_notification()
         self._send_status_change_notification(old_status)
         self._log_status_change(old_status)
 
@@ -185,6 +193,13 @@ class MaintenanceRequest(Document):
             send_status_change_notification,
         )
         send_status_change_notification(self, old_status)
+
+    def _send_completion_notification(self):
+        try:
+            from asset_maintenance_pro.asset_maintenance.notifications import send_completion_notification
+            send_completion_notification(self)
+        except Exception:
+            pass
 
     def _log_status_change(self, old_status):
         """Write a Work Log entry automatically on status transitions."""
