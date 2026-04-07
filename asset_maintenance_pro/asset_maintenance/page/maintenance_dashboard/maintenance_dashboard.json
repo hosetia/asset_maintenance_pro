@@ -1,0 +1,13 @@
+{
+ "doctype": "Page",
+ "module": "Asset Maintenance",
+ "name": "maintenance-dashboard",
+ "page_name": "maintenance-dashboard",
+ "roles": [
+  {"role": "System Manager"},
+  {"role": "Branch Manager"},
+  {"role": "Maintenance Technician"}
+ ],
+ "standard": "No",
+ "title": "Maintenance Dashboard"
+}

@@ -1,48 +1,101 @@
-/* Asset Maintenance Pro — Custom Styles */
+/* ═══════════════════════════════════════════════════════════
+   Asset Maintenance Pro — Professional UI Styles
+   ═══════════════════════════════════════════════════════════ */
 
-/* Priority badge colors in list view */
-.dt-cell [data-fieldname="priority"] .filterable[data-label="Critical"] {
-    background-color: #ff5858;
-    color: #fff;
-    padding: 2px 6px;
-    border-radius: 4px;
-    font-weight: 600;
-}
-.dt-cell [data-fieldname="priority"] .filterable[data-label="High"] {
-    background-color: #ff8c00;
-    color: #fff;
-    padding: 2px 6px;
-    border-radius: 4px;
-}
+/* ── Kanban Column Headers ─────────────────────────────────── */
+.kanban-column[data-column-value="New"]           .kanban-column-header { border-top: 4px solid #2490ef; }
+.kanban-column[data-column-value="Assigned"]      .kanban-column-header { border-top: 4px solid #ff8c00; }
+.kanban-column[data-column-value="In Progress"]   .kanban-column-header { border-top: 4px solid #f0b429; }
+.kanban-column[data-column-value="Waiting Parts"] .kanban-column-header { border-top: 4px solid #e53e3e; }
+.kanban-column[data-column-value="Awaiting Close"].kanban-column-header { border-top: 4px solid #805ad5; }
+.kanban-column[data-column-value="Completed"]     .kanban-column-header { border-top: 4px solid #38a169; }
 
-/* Kanban column header colors */
-.kanban-column[data-column-value="New"] .kanban-column-header {
-    border-top: 3px solid #5e64ff;
+/* ── Kanban Card Styles ────────────────────────────────────── */
+.kanban-card { border-radius: 8px !important; box-shadow: 0 2px 8px rgba(0,0,0,0.08) !important; }
+.kanban-card:hover { box-shadow: 0 4px 16px rgba(0,0,0,0.14) !important; transform: translateY(-1px); transition: all 0.2s; }
+
+/* ── Priority Badges ───────────────────────────────────────── */
+.indicator.red    { background: #e53e3e !important; }
+.indicator.orange { background: #ff8c00 !important; }
+.indicator.yellow { background: #f0b429 !important; }
+.indicator.purple { background: #805ad5 !important; }
+.indicator.green  { background: #38a169 !important; }
+.indicator.blue   { background: #2490ef !important; }
+
+/* ── Workspace Shortcut Cards ──────────────────────────────── */
+.widget.shortcut-widget-box {
+    border-radius: 10px !important;
+    transition: all 0.2s ease !important;
+    border: 1px solid var(--border-color) !important;
 }
-.kanban-column[data-column-value="Assigned"] .kanban-column-header {
-    border-top: 3px solid #ff8c00;
-}
-.kanban-column[data-column-value="In Progress"] .kanban-column-header {
-    border-top: 3px solid #f0b429;
-}
-.kanban-column[data-column-value="Waiting Parts"] .kanban-column-header {
-    border-top: 3px solid #e53e3e;
-}
-.kanban-column[data-column-value="Awaiting Close"] .kanban-column-header {
-    border-top: 3px solid #805ad5;
-}
-.kanban-column[data-column-value="Completed"] .kanban-column-header {
-    border-top: 3px solid #38a169;
+.widget.shortcut-widget-box:hover {
+    transform: translateY(-2px) !important;
+    box-shadow: 0 6px 20px rgba(0,0,0,0.12) !important;
 }
 
-/* Overdue highlight */
-.list-row[data-name] .list-subject .overdue-badge {
+/* ── Form Asset Info Card ──────────────────────────────────── */
+.amp-asset-card {
+    background: linear-gradient(135deg, #f0f4ff 0%, #e8f0fe 100%);
+    border-left: 4px solid #2490ef;
+    padding: 12px 16px;
+    border-radius: 8px;
+    margin: 10px 0;
+    font-size: 13px;
+    line-height: 1.8;
+}
+
+/* ── SLA Countdown Badge ───────────────────────────────────── */
+.amp-sla-badge {
     display: inline-block;
-    background: #e53e3e;
-    color: #fff;
+    padding: 3px 10px;
+    border-radius: 12px;
+    font-size: 11px;
+    font-weight: 600;
+    margin-left: 8px;
+}
+.amp-sla-ok      { background: #c6f6d5; color: #276749; }
+.amp-sla-risk    { background: #feebc8; color: #9c4221; }
+.amp-sla-breach  { background: #fed7d7; color: #9b2c2c; }
+
+/* ── Dashboard Charts ──────────────────────────────────────── */
+.amp-stat-card {
+    background: #fff;
+    border-radius: 12px;
+    padding: 20px;
+    text-align: center;
+    box-shadow: 0 2px 12px rgba(0,0,0,0.07);
+    border: 1px solid #edf2f7;
+    transition: all 0.2s;
+}
+.amp-stat-card:hover { box-shadow: 0 4px 20px rgba(0,0,0,0.12); }
+.amp-stat-number { font-size: 2.5rem; font-weight: 700; line-height: 1; }
+.amp-stat-label  { font-size: 12px; color: #718096; margin-top: 6px; text-transform: uppercase; letter-spacing: 0.05em; }
+
+/* ── Heatmap ───────────────────────────────────────────────── */
+.amp-heatmap-cell {
+    display: inline-block;
+    width: 28px; height: 28px;
+    border-radius: 4px;
+    margin: 2px;
+    cursor: pointer;
+    transition: transform 0.1s;
+}
+.amp-heatmap-cell:hover { transform: scale(1.2); }
+
+/* ── Overdue Row Highlight in List ────────────────────────── */
+.list-row.amp-overdue { border-left: 3px solid #e53e3e; }
+
+/* ── Checklist Progress Bar ────────────────────────────────── */
+.amp-progress {
+    height: 6px;
     border-radius: 3px;
-    padding: 1px 5px;
-    font-size: 10px;
-    margin-left: 6px;
-    vertical-align: middle;
+    background: #edf2f7;
+    overflow: hidden;
+    margin-top: 6px;
+}
+.amp-progress-bar {
+    height: 100%;
+    border-radius: 3px;
+    transition: width 0.3s ease;
+    background: linear-gradient(90deg, #2490ef, #38a169);
 }
