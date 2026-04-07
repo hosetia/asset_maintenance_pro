@@ -1,5 +1,6 @@
 [
  {
+  "doctype": "Custom Field",
   "name": "Asset-custom_maintenance_tab",
   "dt": "Asset",
   "module": "Asset Maintenance",
@@ -9,6 +10,7 @@
   "insert_after": "purchase_date"
  },
  {
+  "doctype": "Custom Field",
   "name": "Asset-custom_last_maintenance_date",
   "dt": "Asset",
   "module": "Asset Maintenance",
@@ -20,6 +22,7 @@
   "in_list_view": 0
  },
  {
+  "doctype": "Custom Field",
   "name": "Asset-custom_maintenance_interval_days",
   "dt": "Asset",
   "module": "Asset Maintenance",
@@ -30,6 +33,7 @@
   "description": "Override checklist interval for this specific asset"
  },
  {
+  "doctype": "Custom Field",
   "name": "Asset-custom_meter_threshold",
   "dt": "Asset",
   "module": "Asset Maintenance",
@@ -39,6 +43,7 @@
   "insert_after": "custom_maintenance_interval_days"
  },
  {
+  "doctype": "Custom Field",
   "name": "Asset-custom_current_meter_value",
   "dt": "Asset",
   "module": "Asset Maintenance",
@@ -49,6 +54,7 @@
   "read_only": 1
  },
  {
+  "doctype": "Custom Field",
   "name": "Asset-custom_meter_uom",
   "dt": "Asset",
   "module": "Asset Maintenance",
