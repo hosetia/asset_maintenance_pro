@@ -1,9 +1,9 @@
 """
-Patch v1.0: Create the Maintenance Kanban Board programmatically.
-Using a patch instead of fixture avoids the get_order_for_column IndexError
-that occurs when Frappe tries to parse empty filters on Kanban Board insert.
+Patch v1.0: Create the Maintenance Kanban Board using direct SQL.
+Bypasses Frappe's naming/validation hooks that cause issues during migrate.
 """
 import frappe
+from frappe.utils import now
 
 
 COLUMNS = [
@@ -20,27 +20,42 @@ def execute():
     if frappe.db.exists("Kanban Board", "Maintenance Kanban"):
         return  # Already created
 
-    # Build column rows
-    columns = []
-    for col_name, indicator in COLUMNS:
-        columns.append({
-            "doctype": "Kanban Board Column",
-            "column_name": col_name,
-            "status": "Active",
+    ts = now()
+
+    # Insert the Kanban Board directly via SQL
+    frappe.db.sql("""
+        INSERT IGNORE INTO `tabKanban Board`
+            (name, board_name, reference_doctype, field_name, filters,
+             private, owner, creation, modified, modified_by, docstatus)
+        VALUES
+            (%(name)s, %(board_name)s, %(ref)s, %(field)s, %(filters)s,
+             0, 'Administrator', %(ts)s, %(ts)s, 'Administrator', 0)
+    """, {
+        "name": "Maintenance Kanban",
+        "board_name": "Maintenance Kanban",
+        "ref": "Maintenance Request",
+        "field": "kanban_column",
+        "filters": '[["Maintenance Request","status","!=","Cancelled",false]]',
+        "ts": ts,
+    })
+
+    # Insert columns
+    for idx, (col_name, indicator) in enumerate(COLUMNS, start=1):
+        frappe.db.sql("""
+            INSERT IGNORE INTO `tabKanban Board Column`
+                (name, parent, parenttype, parentfield, idx,
+                 column_name, status, indicator, `order`,
+                 owner, creation, modified, modified_by, docstatus)
+            VALUES
+                (%(name)s, 'Maintenance Kanban', 'Kanban Board', 'columns', %(idx)s,
+                 %(col)s, 'Active', %(indicator)s, '[]',
+                 'Administrator', %(ts)s, %(ts)s, 'Administrator', 0)
+        """, {
+            "name": f"Maintenance Kanban-{col_name}",
+            "idx": idx,
+            "col": col_name,
             "indicator": indicator,
-            "order": "[]",
+            "ts": ts,
         })
 
-    kb = frappe.get_doc({
-        "doctype": "Kanban Board",
-        "name": "Maintenance Kanban",
-        "reference_doctype": "Maintenance Request",
-        "field_name": "kanban_column",
-        "filters": '[["Maintenance Request","status","!=","Cancelled",false]]',
-        "private": 0,
-        "columns": columns,
-    })
-    kb.flags.ignore_permissions = True
-    kb.flags.ignore_mandatory = True
-    kb.insert()
     frappe.db.commit()
