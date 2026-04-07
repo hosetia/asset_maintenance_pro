@@ -1,36 +1,61 @@
 /**
  * Maintenance Request — Smart Client Script
- * Phase 1: RBAC auto-fill, Asset filtering by Branch, QR support
- * Phase 2: Auto Assignment hints, SLA countdown
+ * Role-based form: Requester sees minimal fields, Manager/Tech sees full form
  */
 
 const STATUS_COLORS = {
     "New":"blue","Assigned":"orange","In Progress":"yellow",
     "Waiting Parts":"red","Awaiting Close":"purple","Completed":"green","Cancelled":"gray"
 };
-const PRIORITY_ICONS = {"Low":"🟢","Medium":"🟡","High":"🟠","Critical":"🔴"};
 
 frappe.ui.form.on("Maintenance Request", {
 
     setup(frm) {
+        // Filter assets by user's branch only
         frm.set_query("asset", () => {
             const filters = { docstatus: 1 };
             if (frm.doc.branch) filters.branch = frm.doc.branch;
             return { filters };
         });
+
+        // Technicians only in assigned_to
         frm.set_query("assigned_to", () => ({
             query: "asset_maintenance_pro.api.get_technicians",
             filters: { branch: frm.doc.branch || "" }
         }));
+
+        // Symptom code filter
+        frm.set_query("symptom_code", () => ({
+            filters: { taxonomy_type: "Symptom" }
+        }));
+        frm.set_query("cause_code", () => ({
+            filters: { taxonomy_type: "Cause" }
+        }));
+        frm.set_query("remedy_code", () => ({
+            filters: { taxonomy_type: "Remedy" }
+        }));
     },
 
     refresh(frm) {
-        _setup_indicator(frm);
+        const roles = frappe.user_roles;
+        const isRequester = _is_requester_only(roles);
+        const isMgr  = roles.includes("System Manager") || roles.includes("Branch Manager") || roles.includes("Maintenance Coordinator");
+        const isTech = roles.includes("Maintenance Technician");
+
+        // Apply role-based visibility
+        _apply_role_visibility(frm, isRequester, isMgr, isTech);
+
+        frm.page.set_indicator(frm.doc.status, STATUS_COLORS[frm.doc.status] || "gray");
         _setup_dashboard(frm);
-        _setup_action_buttons(frm);
-        _toggle_completion_fields(frm);
         _show_sla_countdown(frm);
-        if (frm.is_new()) _autofill_branch(frm);
+
+        if (!isRequester) {
+            _setup_action_buttons(frm, isMgr, isTech);
+        }
+
+        if (frm.is_new()) {
+            _autofill_branch(frm);
+        }
     },
 
     asset(frm) {
@@ -58,50 +83,104 @@ frappe.ui.form.on("Maintenance Request", {
     },
 
     status(frm) {
-        _setup_indicator(frm);
+        frm.page.set_indicator(frm.doc.status, STATUS_COLORS[frm.doc.status] || "gray");
         _toggle_completion_fields(frm);
-    },
-
-    priority(frm) {
-        if (!frm.doc.priority) return;
-        const icon = PRIORITY_ICONS[frm.doc.priority] || "";
-        frm.set_intro(`${icon} <b>${frm.doc.priority} Priority</b>`,
-            frm.doc.priority === "Critical" ? "red" :
-            frm.doc.priority === "High" ? "orange" : "blue");
     },
 
     description(frm) {
         if (frm.doc.description && frm.doc.description.length > 10)
             _suggest_maintenance_type(frm);
     },
+});
 
-    preventive_schedule(frm) {
-        if (!frm.doc.preventive_schedule) return;
-        frappe.call({
-            method: "asset_maintenance_pro.api.get_checklist_tasks",
-            args: { checklist: frm.doc.preventive_schedule },
-            callback(r) {
-                if (!r.message || !r.message.length) return;
-                frm.clear_table("checklist");
-                r.message.forEach(t => frm.add_child("checklist",
-                    { task: t.task, is_mandatory: t.is_mandatory }));
-                frm.refresh_field("checklist");
-                frappe.show_alert({ message: __("{0} tasks loaded",[r.message.length]), indicator:"green"});
-            }
+// ── Role Detection ────────────────────────────────────────────────────────────
+
+function _is_requester_only(roles) {
+    const mgr_roles = ["System Manager","Branch Manager","Maintenance Coordinator","Maintenance Technician"];
+    return !roles.some(r => mgr_roles.includes(r));
+}
+
+// ── Role-Based Field Visibility ───────────────────────────────────────────────
+
+function _apply_role_visibility(frm, isRequester, isMgr, isTech) {
+
+    // ── REQUESTER: Only see basic request fields ──────────────────────────────
+    if (isRequester) {
+        // Show only: asset, branch, description, images, issue_type, impact
+        const requester_fields = ["asset","branch","description","images","issue_type","impact","is_food_safety_impact","is_closure_risk"];
+        const hidden_for_requester = [
+            "maintenance_type","priority","status","kanban_column","assigned_to","due_date",
+            "checklist","total_cost","completion_image","completion_notes",
+            "symptom_code","cause_code","remedy_code","failure_class",
+            "downtime_start","downtime_end","triage_by","verified_by",
+            "request_type","reference_meter_reading","preventive_schedule",
+            "requested_by","requested_on","closed_by","closed_on",
+            "section_break_completion","section_break_checklist",
+        ];
+
+        hidden_for_requester.forEach(f => {
+            try { frm.set_df_property(f, "hidden", 1); } catch(e) {}
         });
-    },
-});
 
-frappe.ui.form.on("Maintenance Request Checklist Item", {
-    completed(frm, cdt, cdn) {
-        const row = locals[cdt][cdn];
-        frappe.model.set_value(cdt, cdn, "completed_by", row.completed ? frappe.session.user : null);
-        frappe.model.set_value(cdt, cdn, "completed_on", row.completed ? frappe.datetime.now_datetime() : null);
-        _update_checklist_progress(frm);
+        // Make key fields required for requester
+        frm.toggle_reqd("asset", true);
+        frm.toggle_reqd("description", true);
+
+        // Hide save button label — show friendly message
+        if (frm.is_new()) {
+            frm.set_intro(
+                __("📝 Describe the issue with the equipment. Our maintenance team will take it from there."),
+                "blue"
+            );
+        }
+
+        // Read-only: cannot change status
+        frm.set_df_property("status", "read_only", 1);
+        return;
     }
-});
 
-// ── Helpers ──────────────────────────────────────────────────────────────────
+    // ── TECHNICIAN: Can update status, add logs, but NOT completion cost/image ─
+    if (isTech && !isMgr) {
+        const hidden_for_tech = [
+            "total_cost","completion_image","assigned_to",
+            "triage_by","verified_by","closed_by","closed_on",
+        ];
+        hidden_for_tech.forEach(f => {
+            try { frm.set_df_property(f, "hidden", 1); } catch(e) {}
+        });
+
+        // Technicians can update: status (limited), checklist, work logs, symptom/cause/remedy
+        frm.set_df_property("status", "read_only",
+            !["In Progress","Waiting Parts","Awaiting Close"].includes(frm.doc.status) ? 0 : 0
+        );
+        _toggle_completion_fields(frm);
+        return;
+    }
+
+    // ── MANAGER / COORDINATOR: Full access ────────────────────────────────────
+    // Unhide all fields
+    const all_fields = [
+        "maintenance_type","priority","status","assigned_to","due_date",
+        "checklist","total_cost","completion_image","completion_notes",
+        "symptom_code","cause_code","remedy_code","failure_class",
+        "downtime_start","downtime_end","triage_by","verified_by",
+        "requested_by","requested_on","closed_by","closed_on",
+    ];
+    all_fields.forEach(f => {
+        try { frm.set_df_property(f, "hidden", 0); } catch(e) {}
+    });
+    _toggle_completion_fields(frm);
+}
+
+function _toggle_completion_fields(frm) {
+    const roles = frappe.user_roles;
+    const isMgr = roles.includes("System Manager") || roles.includes("Branch Manager") || roles.includes("Maintenance Coordinator");
+    const show = ["Awaiting Close","Completed"].includes(frm.doc.status) && isMgr;
+    frm.toggle_reqd("total_cost", show);
+    frm.toggle_reqd("completion_image", show);
+}
+
+// ── Helpers ───────────────────────────────────────────────────────────────────
 
 function _autofill_branch(frm) {
     frappe.call({
@@ -113,8 +192,39 @@ function _autofill_branch(frm) {
     });
 }
 
-function _setup_indicator(frm) {
-    frm.page.set_indicator(frm.doc.status, STATUS_COLORS[frm.doc.status] || "gray");
+function _show_asset_info_card(frm, d) {
+    const html = `<div style="background:#f0f4ff;border-left:4px solid #2490ef;
+        padding:10px 16px;border-radius:6px;margin:8px 0;font-size:13px;line-height:1.8">
+        <b>📦 ${d.asset_name || d.asset}</b><br>
+        <span style="color:#555">
+            ${d.asset_category ? "📁 " + d.asset_category + " &nbsp;|&nbsp;" : ""}
+            ${d.location ? "📍 " + d.location + " &nbsp;|&nbsp;" : ""}
+            ${d.last_maintenance
+                ? "🔧 Last Maintenance: " + frappe.datetime.str_to_user(d.last_maintenance)
+                : "🔧 No maintenance history"}
+            ${d.custom_criticality
+                ? "&nbsp;|&nbsp; ⚡ Criticality: " + d.custom_criticality
+                : ""}
+        </span></div>`;
+    frm.set_intro(html, false);
+}
+
+function _suggest_maintenance_type(frm) {
+    const desc = (frm.doc.description || "").toLowerCase();
+    const keywords = {
+        "Corrective":  ["مش شغال","بطيء","خربان","توقف","error","broken","not working","slow","crash","fail","عطل"],
+        "Preventive":  ["صيانة دورية","تنظيف","فحص","periodic","cleaning","inspection","check","lube"],
+        "Inspection":  ["كشف","مراجعة","تقرير","report","review","audit"],
+    };
+    for (const [type, words] of Object.entries(keywords)) {
+        if (words.some(w => desc.includes(w))) {
+            if (!frm.doc.maintenance_type || frm.doc.maintenance_type !== type) {
+                frm.set_value("maintenance_type", type);
+                frappe.show_alert({ message: __("💡 Type set to: {0}",[type]), indicator:"blue" }, 3);
+            }
+            break;
+        }
+    }
 }
 
 function _setup_dashboard(frm) {
@@ -125,64 +235,15 @@ function _setup_dashboard(frm) {
         callback(r) {
             if (!r.message) return;
             const s = r.message;
-            if (s.work_log_count)  frm.dashboard.add_indicator(__("{0} Work Log(s)",[s.work_log_count]), "blue");
+            if (s.work_log_count)   frm.dashboard.add_indicator(__("{0} Work Log(s)",[s.work_log_count]), "blue");
             if (s.spare_part_count) frm.dashboard.add_indicator(__("{0} Spare Part(s)",[s.spare_part_count]), "orange");
-            if (s.is_overdue)      frm.dashboard.add_indicator(__("⚠️ OVERDUE"), "red");
-            if (s.sla_status)      frm.dashboard.add_indicator(
+            if (s.is_overdue)       frm.dashboard.add_indicator(__("⚠️ OVERDUE"), "red");
+            if (s.sla_status)       frm.dashboard.add_indicator(
                 __("SLA: {0}",[s.sla_status]),
                 s.sla_status === "Breached" ? "red" : s.sla_status === "At Risk" ? "orange" : "green"
             );
         }
     });
-}
-
-function _show_asset_info_card(frm, d) {
-    const html = `<div style="background:#f0f4ff;border-left:4px solid #2490ef;
-        padding:10px 14px;border-radius:6px;margin:8px 0;font-size:13px;line-height:1.8">
-        <b>📦 ${d.asset_name || d.asset}</b><br>
-        <span style="color:#555">
-            ${d.asset_category ? "📁 " + d.asset_category + " &nbsp;|&nbsp;" : ""}
-            ${d.location ? "📍 " + d.location + " &nbsp;|&nbsp;" : ""}
-            ${d.last_maintenance
-                ? "🔧 Last Maintenance: " + frappe.datetime.str_to_user(d.last_maintenance)
-                : "🔧 No maintenance history"}
-        </span></div>`;
-    frm.set_intro(html, false);
-}
-
-function _suggest_maintenance_type(frm) {
-    const desc = (frm.doc.description || "").toLowerCase();
-    const keywords = {
-        "Corrective":  ["مش شغال","بطيء","خربان","توقف","error","broken","not working","slow","crash","fail"],
-        "Preventive":  ["صيانة دورية","تنظيف","فحص","periodic","cleaning","inspection","check","lube"],
-        "Inspection":  ["كشف","مراجعة","تقرير","report","review","audit"],
-    };
-    for (const [type, words] of Object.entries(keywords)) {
-        if (words.some(w => desc.includes(w))) {
-            if (frm.doc.maintenance_type !== type) {
-                frm.set_value("maintenance_type", type);
-                frappe.show_alert({ message: __("💡 Suggested type: {0}",[type]), indicator:"blue" }, 3);
-            }
-            break;
-        }
-    }
-}
-
-function _update_checklist_progress(frm) {
-    const items = frm.doc.checklist || [];
-    if (!items.length) return;
-    const done = items.filter(r => r.completed).length;
-    const pct  = Math.round((done / items.length) * 100);
-    frm.dashboard.add_indicator(
-        __("Checklist: {0}/{1} ({2}%)",[done, items.length, pct]),
-        pct === 100 ? "green" : pct > 50 ? "orange" : "red"
-    );
-}
-
-function _toggle_completion_fields(frm) {
-    const show = ["Awaiting Close","Completed"].includes(frm.doc.status);
-    frm.toggle_reqd("total_cost", show);
-    frm.toggle_reqd("completion_image", show);
 }
 
 function _show_sla_countdown(frm) {
@@ -194,33 +255,40 @@ function _show_sla_countdown(frm) {
         frm.dashboard.add_indicator(__("⏰ Due in {0} day(s)",[diff]), "orange");
 }
 
-function _setup_action_buttons(frm) {
+function _setup_action_buttons(frm, isMgr, isTech) {
     if (frm.is_new()) return;
     const status = frm.doc.status;
-    const roles  = frappe.user_roles;
-    const isMgr  = roles.includes("System Manager") || roles.includes("Branch Manager");
-    const isTech = roles.includes("Maintenance Technician");
 
-    if (status === "New" && isMgr)
-        frm.add_custom_button(__("⚡ Quick Assign"), () => _quick_assign(frm), __("Actions"));
-    if (status === "Assigned" && (isMgr || isTech))
-        frm.add_custom_button(__("▶️ Start Work"), () => _transition(frm,"In Progress"), __("Actions"));
-    if (status === "In Progress" && (isMgr || isTech)) {
-        frm.add_custom_button(__("🔩 Request Parts"), () => _transition(frm,"Waiting Parts"), __("Actions"));
-        frm.add_custom_button(__("✅ Mark Done"), () => _transition(frm,"Awaiting Close"), __("Actions"));
+    // Manager actions
+    if (isMgr) {
+        if (status === "New")
+            frm.add_custom_button(__("⚡ Assign"), () => _quick_assign(frm), __("Actions"));
+        if (status === "Awaiting Close")
+            frm.add_custom_button(__("🏁 Complete"), () => _complete_request(frm), __("Actions"));
+        if (!["Completed","Cancelled"].includes(status))
+            frm.add_custom_button(__("❌ Cancel"), () => _transition(frm,"Cancelled"), __("Actions"));
     }
-    if (status === "Waiting Parts" && (isMgr || isTech))
-        frm.add_custom_button(__("▶️ Resume Work"), () => _transition(frm,"In Progress"), __("Actions"));
-    if (status === "Awaiting Close" && isMgr)
-        frm.add_custom_button(__("🏁 Complete"), () => _complete_request(frm), __("Actions"));
-    if (!["Completed","Cancelled"].includes(status) && isMgr)
-        frm.add_custom_button(__("❌ Cancel"), () => _transition(frm,"Cancelled"), __("Actions"));
 
+    // Technician actions
+    if (isTech || isMgr) {
+        if (status === "Assigned")
+            frm.add_custom_button(__("▶️ Start Work"), () => _transition(frm,"In Progress"), __("Actions"));
+        if (status === "In Progress") {
+            frm.add_custom_button(__("🔩 Request Parts"), () => _transition(frm,"Waiting Parts"), __("Actions"));
+            frm.add_custom_button(__("✅ Mark Done"), () => _transition(frm,"Awaiting Close"), __("Actions"));
+        }
+        if (status === "Waiting Parts")
+            frm.add_custom_button(__("▶️ Resume"), () => _transition(frm,"In Progress"), __("Actions"));
+    }
+
+    // Work log + spare part — for tech and manager (not requester)
     if (!["Completed","Cancelled"].includes(status)) {
         frm.add_custom_button(__("📝 Work Log"), () => _quick_work_log(frm));
-        frm.add_custom_button(__("🔩 Spare Part"), () => _quick_spare_part(frm));
+        if (isMgr || isTech)
+            frm.add_custom_button(__("🔩 Spare Part"), () => _quick_spare_part(frm));
     }
 
+    // View links
     frm.add_custom_button(__("Work Logs"), () =>
         frappe.set_route("List","Maintenance Work Log",{maintenance_request:frm.doc.name}), __("View"));
     frm.add_custom_button(__("Spare Parts"), () =>
@@ -229,6 +297,8 @@ function _setup_action_buttons(frm) {
         frappe.set_route("List","Maintenance Request","kanban","Maintenance Kanban"), __("View"));
 }
 
+// ── Action Dialogs ────────────────────────────────────────────────────────────
+
 function _quick_assign(frm) {
     frappe.call({
         method: "asset_maintenance_pro.api.get_suggested_technician",
@@ -236,7 +306,7 @@ function _quick_assign(frm) {
         callback(r) {
             const suggested = r.message ? r.message.user : "";
             new frappe.ui.Dialog({
-                title: __("⚡ Quick Assign"),
+                title: __("⚡ Assign Request"),
                 fields: [
                     { fieldname:"assigned_to", fieldtype:"Link", label:__("Assign To"),
                       options:"User", reqd:1, default:suggested,
@@ -247,14 +317,19 @@ function _quick_assign(frm) {
                       default:frappe.datetime.add_days(frappe.datetime.nowdate(),3) },
                     { fieldname:"priority", fieldtype:"Select", label:__("Priority"),
                       options:"Low\nMedium\nHigh\nCritical", default:frm.doc.priority||"Medium" },
+                    { fieldname:"maintenance_type", fieldtype:"Select", label:__("Type"),
+                      options:"Corrective\nPreventive\nInspection", default:frm.doc.maintenance_type||"Corrective" },
                 ],
                 primary_action_label: __("Assign"),
                 primary_action(vals) {
                     frm.set_value("assigned_to", vals.assigned_to);
                     frm.set_value("due_date", vals.due_date);
                     frm.set_value("priority", vals.priority);
+                    frm.set_value("maintenance_type", vals.maintenance_type);
                     frm.set_value("status", "Assigned");
-                    frm.save();
+                    frm.save().then(() =>
+                        frappe.show_alert({message:__("Assigned ✅"),indicator:"green"})
+                    );
                     this.hide();
                 }
             }).show();
@@ -293,7 +368,12 @@ function _quick_work_log(frm) {
                 method:"asset_maintenance_pro.api.add_work_log",
                 args:{maintenance_request:frm.doc.name,...vals},
                 freeze:true,
-                callback(r){if(r.message){frappe.show_alert({message:__("Saved"),indicator:"green"});frm.reload_doc();}}
+                callback(r){
+                    if(r.message){
+                        frappe.show_alert({message:__("Saved ✅"),indicator:"green"});
+                        frm.reload_doc();
+                    }
+                }
             });
             this.hide();
         }
@@ -315,7 +395,7 @@ function _quick_spare_part(frm) {
                 doctype:"Spare Part Consumption",
                 maintenance_request:frm.doc.name, ...vals
             }).then(()=>{
-                frappe.show_alert({message:__("Added"),indicator:"green"});
+                frappe.show_alert({message:__("Added ✅"),indicator:"green"});
                 frm.reload_doc();
             });
             this.hide();
