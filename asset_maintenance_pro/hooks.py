@@ -59,8 +59,7 @@ scheduler_events = {
 
 # ── Permissions ───────────────────────────────────────────────────────────────
 permission_query_conditions = {
-    "Maintenance Request":    "asset_maintenance_pro.asset_maintenance.permissions.maintenance_request_query",
-    "Maintenance Work Order": "asset_maintenance_pro.asset_maintenance.permissions.work_order_query",
+    "Maintenance Request": "asset_maintenance_pro.asset_maintenance.permissions.maintenance_request_query",
 }
 has_permission = {
     "Maintenance Request": "asset_maintenance_pro.asset_maintenance.permissions.has_maintenance_request_permission",
