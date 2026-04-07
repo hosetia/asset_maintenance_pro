@@ -59,7 +59,8 @@
   },
   {
    "fieldname": "column_break_1",
-   "fieldtype": "Column Break"
+   "fieldtype": "Column Break",
+   "label": ""
   },
   {
    "fieldname": "qty",
@@ -110,7 +111,8 @@
   },
   {
    "fieldname": "column_break_2",
-   "fieldtype": "Column Break"
+   "fieldtype": "Column Break",
+   "label": ""
   },
   {
    "fieldname": "consumed_by",

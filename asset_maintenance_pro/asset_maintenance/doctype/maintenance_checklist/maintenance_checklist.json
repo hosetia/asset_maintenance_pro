@@ -50,7 +50,8 @@
   },
   {
    "fieldname": "column_break_1",
-   "fieldtype": "Column Break"
+   "fieldtype": "Column Break",
+   "label": ""
   },
   {
    "fieldname": "is_active",
@@ -103,7 +104,8 @@
   },
   {
    "fieldname": "column_break_trigger2",
-   "fieldtype": "Column Break"
+   "fieldtype": "Column Break",
+   "label": ""
   },
   {
    "fieldname": "last_generated_date",

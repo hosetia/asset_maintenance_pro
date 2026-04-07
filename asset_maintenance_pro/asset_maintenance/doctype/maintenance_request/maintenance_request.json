@@ -85,7 +85,8 @@
   },
   {
    "fieldname": "column_break_1",
-   "fieldtype": "Column Break"
+   "fieldtype": "Column Break",
+   "label": ""
   },
   {
    "fieldname": "status",
@@ -205,7 +206,8 @@
   },
   {
    "fieldname": "column_break_meta2",
-   "fieldtype": "Column Break"
+   "fieldtype": "Column Break",
+   "label": ""
   },
   {
    "fieldname": "requested_by",
@@ -286,13 +288,34 @@
  "sort_field": "modified",
  "sort_order": "DESC",
  "states": [
-  {"color": "Blue", "title": "New"},
-  {"color": "Orange", "title": "Assigned"},
-  {"color": "Yellow", "title": "In Progress"},
-  {"color": "Red", "title": "Waiting Parts"},
-  {"color": "Purple", "title": "Awaiting Close"},
-  {"color": "Green", "title": "Completed"},
-  {"color": "Gray", "title": "Cancelled"}
+  {
+   "color": "Blue",
+   "title": "New"
+  },
+  {
+   "color": "Orange",
+   "title": "Assigned"
+  },
+  {
+   "color": "Yellow",
+   "title": "In Progress"
+  },
+  {
+   "color": "Red",
+   "title": "Waiting Parts"
+  },
+  {
+   "color": "Purple",
+   "title": "Awaiting Close"
+  },
+  {
+   "color": "Green",
+   "title": "Completed"
+  },
+  {
+   "color": "Gray",
+   "title": "Cancelled"
+  }
  ],
  "title_field": "name",
  "track_changes": 1

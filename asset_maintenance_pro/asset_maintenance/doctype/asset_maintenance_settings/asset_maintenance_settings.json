@@ -77,7 +77,8 @@
   },
   {
    "fieldname": "column_break_notif",
-   "fieldtype": "Column Break"
+   "fieldtype": "Column Break",
+   "label": ""
   },
   {
    "fieldname": "notify_on_new_request",
@@ -123,7 +124,8 @@
   },
   {
    "fieldname": "column_break_stock",
-   "fieldtype": "Column Break"
+   "fieldtype": "Column Break",
+   "label": ""
   },
   {
    "fieldname": "stock_entry_type",

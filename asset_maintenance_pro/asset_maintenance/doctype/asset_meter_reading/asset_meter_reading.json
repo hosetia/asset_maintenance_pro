@@ -59,7 +59,8 @@
   },
   {
    "fieldname": "column_break_1",
-   "fieldtype": "Column Break"
+   "fieldtype": "Column Break",
+   "label": ""
   },
   {
    "fieldname": "meter_value",
