@@ -7,6 +7,7 @@ from frappe.utils import today, flt
 def on_maintenance_request_insert(doc, method=None):
     _set_sla_due_date(doc)
     _auto_set_priority_from_impact(doc)
+    _check_warranty_alert(doc)
     from asset_maintenance_pro.asset_maintenance.notifications import send_new_request_notification
     send_new_request_notification(doc)
 
@@ -93,3 +94,20 @@ def _send_contract_renewal_alert(doc):
             _send_email(user, subject, message)
         except Exception:
             pass
+
+
+def _check_warranty_alert(doc):
+    """Alert if asset is still under warranty when creating a maintenance request."""
+    if not doc.asset:
+        return
+    warranty_end = frappe.db.get_value("Asset", doc.asset, "custom_warranty_end")
+    if not warranty_end:
+        return
+    from frappe.utils import getdate, today
+    if getdate(warranty_end) >= getdate(today()):
+        frappe.msgprint(
+            f"🛡️ <b>تنبيه الضمان:</b> الجهاز <b>{doc.asset}</b> لا يزال تحت الضمان "
+            f"حتى <b>{warranty_end}</b>. يُرجى التحقق قبل تحمل أي تكاليف خارجية.",
+            title="تنبيه ضمان الجهاز",
+            indicator="orange"
+        )

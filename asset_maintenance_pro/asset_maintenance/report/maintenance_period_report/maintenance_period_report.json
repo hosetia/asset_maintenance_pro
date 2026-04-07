@@ -1,0 +1,24 @@
+{
+ "doctype": "Report",
+ "name": "Maintenance Period Report",
+ "ref_doctype": "Maintenance Request",
+ "report_type": "Script Report",
+ "module": "Asset Maintenance",
+ "is_standard": "No",
+ "disabled": 0,
+ "roles": [
+  {
+   "role": "System Manager"
+  },
+  {
+   "role": "Branch Manager"
+  },
+  {
+   "role": "Maintenance Coordinator"
+  },
+  {
+   "role": "Maintenance Technician"
+  }
+ ],
+ "report_script": "def execute(filters=None):\n    filters = filters or {}\n    status_filter = filters.get(\"status_filter\") or \"All\"\n    branch_filter = filters.get(\"branch\") or \"\"\n    from_date = filters.get(\"from_date\") or frappe.utils.add_months(frappe.utils.today(), -1)\n    to_date   = filters.get(\"to_date\")   or frappe.utils.today()\n\n    columns = [\n        {\"label\":\"رقم الطلب\",        \"fieldname\":\"name\",                     \"fieldtype\":\"Link\",     \"options\":\"Maintenance Request\",\"width\":160},\n        {\"label\":\"تاريخ الإنشاء\",    \"fieldname\":\"creation_date\",            \"fieldtype\":\"Date\",     \"width\":110},\n        {\"label\":\"الفرع\",            \"fieldname\":\"branch\",                   \"fieldtype\":\"Link\",     \"options\":\"Branch\",\"width\":130},\n        {\"label\":\"الجهاز\",           \"fieldname\":\"asset\",                    \"fieldtype\":\"Link\",     \"options\":\"Asset\",\"width\":150},\n        {\"label\":\"نوع الصيانة\",      \"fieldname\":\"maintenance_type\",         \"fieldtype\":\"Data\",     \"width\":110},\n        {\"label\":\"الأولوية\",         \"fieldname\":\"priority\",                 \"fieldtype\":\"Data\",     \"width\":80},\n        {\"label\":\"الحالة\",           \"fieldname\":\"status\",                   \"fieldtype\":\"Data\",     \"width\":120},\n        {\"label\":\"المعين إليه\",      \"fieldname\":\"assigned_to\",              \"fieldtype\":\"Link\",     \"options\":\"User\",\"width\":130},\n        {\"label\":\"تاريخ الاستحقاق\", \"fieldname\":\"due_date\",                 \"fieldtype\":\"Date\",     \"width\":110},\n        {\"label\":\"تاريخ الإغلاق\",   \"fieldname\":\"closed_on\",                \"fieldtype\":\"Datetime\", \"width\":140},\n        {\"label\":\"مدة الإنجاز (ساعة)\",\"fieldname\":\"completion_duration_hours\",\"fieldtype\":\"Float\",   \"width\":140},\n        {\"label\":\"التكلفة\",          \"fieldname\":\"total_cost\",               \"fieldtype\":\"Currency\", \"width\":110},\n        {\"label\":\"نوع الطلب\",        \"fieldname\":\"request_type\",             \"fieldtype\":\"Data\",     \"width\":120},\n        {\"label\":\"وصف المشكلة\",      \"fieldname\":\"description_short\",        \"fieldtype\":\"Data\",     \"width\":200},\n    ]\n\n    cond = \"WHERE DATE(mr.creation) BETWEEN %(from_date)s AND %(to_date)s\"\n    params = {\"from_date\": from_date, \"to_date\": to_date}\n\n    if branch_filter:\n        cond += \" AND mr.branch = %(branch)s\"\n        params[\"branch\"] = branch_filter\n\n    if status_filter == \"Completed\":\n        cond += \" AND mr.status = 'Completed'\"\n    elif status_filter == \"Open\":\n        cond += \" AND mr.status NOT IN ('Completed','Cancelled')\"\n    elif status_filter == \"Overdue\":\n        cond += \" AND mr.status NOT IN ('Completed','Cancelled') AND mr.due_date < CURDATE()\"\n    elif status_filter == \"Cancelled\":\n        cond += \" AND mr.status = 'Cancelled'\"\n\n    rows = frappe.db.sql(f\"\"\"\n        SELECT mr.name, DATE(mr.creation) AS creation_date,\n               mr.branch, mr.asset, mr.maintenance_type, mr.priority,\n               mr.status, mr.assigned_to, mr.due_date, mr.closed_on,\n               mr.completion_duration_hours, mr.total_cost,\n               mr.request_type, LEFT(mr.description,80) AS description_short\n        FROM `tabMaintenance Request` mr\n        {cond}\n        ORDER BY mr.creation DESC\n    \"\"\", params, as_dict=True)\n\n    data = [dict(r) for r in rows]\n\n    # Totals\n    total_cost  = sum(float(r.get(\"total_cost\") or 0) for r in rows)\n    total_hours = sum(float(r.get(\"completion_duration_hours\") or 0) for r in rows)\n    data.append({})\n    data.append({\n        \"name\": f\"📊 الإجمالي: {len(rows)} طلب\",\n        \"total_cost\": total_cost,\n        \"completion_duration_hours\": round(total_hours, 1),\n    })\n    return columns, data\n"
+}

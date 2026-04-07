@@ -1,4 +1,4 @@
-"""Patch: Create complete Asset Maintenance Pro Workspace — v3.0."""
+"""Patch v1.0: Create full Asset Maintenance Pro Workspace v4.0 — grouped cards."""
 import frappe, json
 
 WS_NAME = "Asset Maintenance Pro"
@@ -6,94 +6,112 @@ WS_NAME = "Asset Maintenance Pro"
 CONTENT = json.dumps([
     {"type":"header","data":{"text":"<h2>🔧 Asset Maintenance Pro</h2>","col":12}},
 
-    {"type":"header","data":{"text":"<h4>📋 Requests & Work Orders</h4>","col":12}},
-    {"type":"shortcut","data":{"shortcut_name":"Maintenance Request","col":3}},
-    {"type":"shortcut","data":{"shortcut_name":"New Request","col":3}},
-    {"type":"shortcut","data":{"shortcut_name":"Work Order","col":3}},
-    {"type":"shortcut","data":{"shortcut_name":"Work Logs","col":3}},
+    # ── Operations ─────────────────────────────────────────────────────────────
+    {"type":"header","data":{"text":"<h4>📋 العمليات</h4>","col":12}},
+    {"type":"shortcut","data":{"shortcut_name":"طلب صيانة جديد","col":3}},
+    {"type":"shortcut","data":{"shortcut_name":"كل الطلبات","col":3}},
+    {"type":"shortcut","data":{"shortcut_name":"أوامر العمل","col":3}},
+    {"type":"shortcut","data":{"shortcut_name":"طلبات قطع الغيار","col":3}},
 
-    {"type":"header","data":{"text":"<h4>📊 Dashboard & Kanban</h4>","col":12}},
-    {"type":"shortcut","data":{"shortcut_name":"Dashboard","col":3}},
-    {"type":"shortcut","data":{"shortcut_name":"Open Requests","col":3}},
-    {"type":"shortcut","data":{"shortcut_name":"Overdue Requests","col":3}},
-    {"type":"shortcut","data":{"shortcut_name":"Spare Part Request","col":3}},
+    # ── Dashboard ──────────────────────────────────────────────────────────────
+    {"type":"header","data":{"text":"<h4>📊 لوحات التحكم والتقارير</h4>","col":12}},
+    {"type":"shortcut","data":{"shortcut_name":"لوحة التحكم","col":3}},
+    {"type":"shortcut","data":{"shortcut_name":"تقرير دوري","col":3}},
+    {"type":"shortcut","data":{"shortcut_name":"تحليل TCO","col":3}},
+    {"type":"shortcut","data":{"shortcut_name":"مطابقة SLA","col":3}},
 
-    {"type":"header","data":{"text":"<h4>⚙️ Masters & Configuration</h4>","col":12}},
-    {"type":"shortcut","data":{"shortcut_name":"Maintenance Checklist","col":3}},
-    {"type":"shortcut","data":{"shortcut_name":"SLA Policies","col":3}},
-    {"type":"shortcut","data":{"shortcut_name":"Assignment Rules","col":3}},
-    {"type":"shortcut","data":{"shortcut_name":"Maintenance Teams","col":3}},
+    # ── Config ─────────────────────────────────────────────────────────────────
+    {"type":"header","data":{"text":"<h4>⚙️ الإعدادات والتخطيط</h4>","col":12}},
+    {"type":"shortcut","data":{"shortcut_name":"جداول PM","col":3}},
+    {"type":"shortcut","data":{"shortcut_name":"سياسات SLA","col":3}},
+    {"type":"shortcut","data":{"shortcut_name":"فرق الصيانة","col":3}},
+    {"type":"shortcut","data":{"shortcut_name":"قواعد التعيين","col":3}},
 
-    {"type":"header","data":{"text":"<h4>🏢 Compliance & Contracts</h4>","col":12}},
-    {"type":"shortcut","data":{"shortcut_name":"Inspections","col":3}},
-    {"type":"shortcut","data":{"shortcut_name":"Service Contracts","col":3}},
-    {"type":"shortcut","data":{"shortcut_name":"Meter Readings","col":3}},
-    {"type":"shortcut","data":{"shortcut_name":"Locations","col":3}},
+    # ── Compliance ─────────────────────────────────────────────────────────────
+    {"type":"header","data":{"text":"<h4>🏢 الامتثال والعقود</h4>","col":12}},
+    {"type":"shortcut","data":{"shortcut_name":"الفحوصات","col":3}},
+    {"type":"shortcut","data":{"shortcut_name":"عقود الخدمة","col":3}},
+    {"type":"shortcut","data":{"shortcut_name":"قراءات العداد","col":3}},
+    {"type":"shortcut","data":{"shortcut_name":"المواقع","col":3}},
 
-    {"type":"header","data":{"text":"<h4>📈 Reports</h4>","col":12}},
-    {"type":"shortcut","data":{"shortcut_name":"Asset Uptime","col":3}},
-    {"type":"shortcut","data":{"shortcut_name":"MTTR & MTBF","col":3}},
-    {"type":"shortcut","data":{"shortcut_name":"PM Compliance","col":3}},
-    {"type":"shortcut","data":{"shortcut_name":"Pareto Analysis","col":3}},
-
-    {"type":"header","data":{"text":"<h4>🧠 Knowledge & Settings</h4>","col":12}},
-    {"type":"shortcut","data":{"shortcut_name":"Knowledge Base","col":3}},
-    {"type":"shortcut","data":{"shortcut_name":"Asset Taxonomy","col":3}},
-    {"type":"shortcut","data":{"shortcut_name":"Completed Requests","col":3}},
-    {"type":"shortcut","data":{"shortcut_name":"Settings","col":3}},
+    # ── Knowledge ──────────────────────────────────────────────────────────────
+    {"type":"header","data":{"text":"<h4>🧠 المعرفة والأدلة</h4>","col":12}},
+    {"type":"shortcut","data":{"shortcut_name":"قاعدة المعرفة","col":3}},
+    {"type":"shortcut","data":{"shortcut_name":"الأدلة التقنية","col":3}},
+    {"type":"shortcut","data":{"shortcut_name":"BOM الصيانة","col":3}},
+    {"type":"shortcut","data":{"shortcut_name":"تصنيف الأعطال","col":3}},
 ])
 
 SHORTCUTS = [
-    ("Maintenance Request",   "Maintenance Request",         "DocType", 1,  "#2490EF", "tool"),
-    ("New Request",           "Maintenance Request",         "DocType", 2,  "#28a745", "add"),
-    ("Work Order",            "Maintenance Work Order",      "DocType", 3,  "#fd7e14", "list"),
-    ("Work Logs",             "Maintenance Work Log",        "DocType", 4,  "#6c757d", "file"),
-    ("Dashboard",             "maintenance-dashboard",       "Page",    5,  "#6f42c1", "dashboard"),
-    ("Open Requests",         "Maintenance Request",         "DocType", 6,  "#2490EF", "list"),
-    ("Overdue Requests",      "Maintenance Request",         "DocType", 7,  "#dc3545", "error"),
-    ("Spare Part Request",    "Spare Part Request",          "DocType", 8,  "#17a2b8", "stock"),
-    ("Maintenance Checklist", "Maintenance Checklist",       "DocType", 9,  "#6f42c1", "list"),
-    ("SLA Policies",          "Maintenance SLA Policy",      "DocType", 10, "#e83e8c", "timer"),
-    ("Assignment Rules",      "Maintenance Assignment Rule", "DocType", 11, "#20c997", "assign"),
-    ("Maintenance Teams",     "Maintenance Team",            "DocType", 12, "#fd7e14", "group"),
-    ("Inspections",           "Maintenance Inspection",      "DocType", 13, "#dc3545", "tick"),
-    ("Service Contracts",     "Service Contract",            "DocType", 14, "#6f42c1", "file-text"),
-    ("Meter Readings",        "Asset Meter Reading",         "DocType", 15, "#17a2b8", "dashboard"),
-    ("Locations",             "Maintenance Location",        "DocType", 16, "#28a745", "map-pin"),
-    ("Asset Uptime",          "Asset Availability & Uptime", "Report",  17, "#2490EF", "bar-chart"),
-    ("MTTR & MTBF",           "MTTR & MTBF Analysis",       "Report",  18, "#fd7e14", "trending-up"),
-    ("PM Compliance",         "PM Compliance",               "Report",  19, "#28a745", "check-circle"),
-    ("Pareto Analysis",       "Pareto Fault Analysis",       "Report",  20, "#dc3545", "pie-chart"),
-    ("Knowledge Base",        "Maintenance Knowledge Base",  "DocType", 21, "#6610f2", "book"),
-    ("Asset Taxonomy",        "Asset Taxonomy",              "DocType", 22, "#6c757d", "tag"),
-    ("Completed Requests",    "Maintenance Request",         "DocType", 23, "#28a745", "check"),
-    ("Settings",              "Asset Maintenance Settings",  "DocType", 24, "#6c757d", "setting"),
+    # Operations
+    ("طلب صيانة جديد",  "Maintenance Request",         "DocType", 1,  "#28a745", "add"),
+    ("كل الطلبات",       "Maintenance Request",         "DocType", 2,  "#2490EF", "list"),
+    ("أوامر العمل",      "Maintenance Work Order",      "DocType", 3,  "#fd7e14", "tool"),
+    ("طلبات قطع الغيار","Spare Part Request",           "DocType", 4,  "#17a2b8", "stock"),
+    # Dashboard & Reports
+    ("لوحة التحكم",      "maintenance-dashboard",       "Page",    5,  "#6f42c1", "dashboard"),
+    ("تقرير دوري",       "Maintenance Period Report",   "Report",  6,  "#20c997", "file-text"),
+    ("تحليل TCO",        "TCO Analysis",                "Report",  7,  "#e83e8c", "bar-chart"),
+    ("مطابقة SLA",       "PM Compliance",               "Report",  8,  "#fd7e14", "check-circle"),
+    # Config
+    ("جداول PM",         "Maintenance Checklist",       "DocType", 9,  "#6f42c1", "list"),
+    ("سياسات SLA",       "Maintenance SLA Policy",      "DocType", 10, "#e83e8c", "timer"),
+    ("فرق الصيانة",      "Maintenance Team",            "DocType", 11, "#20c997", "users"),
+    ("قواعد التعيين",    "Maintenance Assignment Rule", "DocType", 12, "#17a2b8", "assign"),
+    # Compliance
+    ("الفحوصات",         "Maintenance Inspection",      "DocType", 13, "#dc3545", "clipboard"),
+    ("عقود الخدمة",      "Service Contract",            "DocType", 14, "#6f42c1", "file-text"),
+    ("قراءات العداد",    "Asset Meter Reading",         "DocType", 15, "#17a2b8", "activity"),
+    ("المواقع",          "Maintenance Location",        "DocType", 16, "#28a745", "map-pin"),
+    # Knowledge
+    ("قاعدة المعرفة",    "Maintenance Knowledge Base",  "DocType", 17, "#6610f2", "book"),
+    ("الأدلة التقنية",   "Maintenance Technical Manual","DocType", 18, "#fd7e14", "book-open"),
+    ("BOM الصيانة",      "Maintenance BOM",             "DocType", 19, "#20c997", "layers"),
+    ("تصنيف الأعطال",   "Asset Taxonomy",              "DocType", 20, "#6c757d", "tag"),
 ]
 
 LINKS = [
-    {"label":"Maintenance Operations","items":[
-        {"name":"Maintenance Request",      "label":"Maintenance Request"},
-        {"name":"Maintenance Work Order",   "label":"Work Order"},
-        {"name":"Maintenance Work Log",     "label":"Work Log"},
-        {"name":"Spare Part Consumption",   "label":"Spare Parts"},
-        {"name":"Spare Part Request",       "label":"Spare Part Request"},
+    {"label":"📋 العمليات اليومية","items":[
+        {"name":"Maintenance Request",    "label":"طلب صيانة"},
+        {"name":"Maintenance Work Order", "label":"أمر عمل"},
+        {"name":"Spare Part Request",     "label":"طلب قطع غيار"},
+        {"name":"Maintenance Work Log",   "label":"سجل العمل"},
+        {"name":"Spare Part Consumption", "label":"استهلاك قطع الغيار"},
     ]},
-    {"label":"Planning & PM","items":[
-        {"name":"Maintenance Checklist",        "label":"PM Checklist"},
-        {"name":"Maintenance SLA Policy",       "label":"SLA Policy"},
-        {"name":"Maintenance Assignment Rule",  "label":"Assignment Rule"},
-        {"name":"Maintenance Team",             "label":"Maintenance Team"},
-        {"name":"Asset Maintenance Settings",   "label":"Settings"},
+    {"label":"📊 التقارير والتحليل","items":[
+        {"name":"Maintenance Period Report","label":"تقرير الفترة"},
+        {"name":"TCO Analysis",             "label":"تحليل TCO"},
+        {"name":"Asset Availability & Uptime","label":"توفر الأصول"},
+        {"name":"MTTR & MTBF Analysis",     "label":"MTTR & MTBF"},
+        {"name":"PM Compliance",            "label":"مطابقة PM"},
+        {"name":"Open Tickets Aging",       "label":"تقادم الطلبات"},
+        {"name":"Pareto Fault Analysis",    "label":"تحليل باريتو"},
+        {"name":"Technician Productivity",  "label":"إنتاجية الفنيين"},
+        {"name":"Vendor SLA Compliance",    "label":"مطابقة مورد SLA"},
+        {"name":"Maintenance Cost by Branch","label":"التكلفة بالفرع"},
+        {"name":"Spare Parts Consumption",  "label":"استهلاك قطع الغيار"},
+        {"name":"Repeat Failures Analysis", "label":"تحليل الأعطال المتكررة"},
+        {"name":"Warranty Expiry Tracker",  "label":"تتبع انتهاء الضمان"},
+        {"name":"Contract Utilization",     "label":"استخدام العقود"},
     ]},
-    {"label":"Compliance & Contracts","items":[
-        {"name":"Maintenance Inspection",    "label":"Inspection"},
-        {"name":"Service Contract",          "label":"Service Contract"},
-        {"name":"Asset Meter Reading",       "label":"Meter Reading"},
-        {"name":"Maintenance Location",      "label":"Location"},
-        {"name":"Asset Taxonomy",            "label":"Asset Taxonomy"},
+    {"label":"⚙️ الإعدادات والتخطيط","items":[
+        {"name":"Maintenance Checklist",       "label":"جدول PM"},
+        {"name":"Maintenance SLA Policy",      "label":"سياسة SLA"},
+        {"name":"Maintenance Assignment Rule", "label":"قاعدة التعيين"},
+        {"name":"Maintenance Team",            "label":"فريق الصيانة"},
+        {"name":"Maintenance BOM",             "label":"BOM الصيانة"},
+        {"name":"Asset Maintenance Settings",  "label":"الإعدادات"},
     ]},
-    {"label":"Knowledge","items":[
-        {"name":"Maintenance Knowledge Base","label":"Knowledge Base"},
+    {"label":"🏢 الامتثال والضمان","items":[
+        {"name":"Maintenance Inspection",       "label":"الفحوصات"},
+        {"name":"Service Contract",             "label":"عقد الخدمة"},
+        {"name":"Asset Meter Reading",          "label":"قراءة العداد"},
+        {"name":"Maintenance Location",         "label":"الموقع"},
+        {"name":"Maintenance Technical Manual", "label":"الدليل التقني"},
+    ]},
+    {"label":"🧠 المعرفة والتصنيف","items":[
+        {"name":"Maintenance Knowledge Base","label":"قاعدة المعرفة"},
+        {"name":"Asset Taxonomy",            "label":"تصنيف الأعطال"},
     ]},
 ]
 
@@ -128,10 +146,8 @@ def execute():
             for label, link_to, stype, idx, color, icon in SHORTCUTS:
                 if valid_types and stype not in valid_types:
                     stype = "DocType"
-                    if label in ("Dashboard",):
-                        link_to = "Maintenance Request"
-                    elif label in ("Asset Uptime","MTTR & MTBF","PM Compliance","Pareto Analysis"):
-                        link_to = "Maintenance Request"
+                    if stype == "Page": link_to = "Maintenance Request"
+                    elif stype == "Report": link_to = "Maintenance Request"
                 row = {"label": label, "link_to": link_to, "type": stype, "idx": idx}
                 if "color" in sc_fields: row["color"] = color
                 if "icon"  in sc_fields: row["icon"]  = icon
@@ -153,7 +169,7 @@ def execute():
         ws.flags.ignore_validate    = True
         ws.insert(set_name=WS_NAME)
         frappe.db.commit()
-        print("✅ Workspace v3.0 created")
+        print("✅ Workspace v4.0 created")
     except Exception as e:
-        frappe.log_error(frappe.get_traceback(), "AMP Workspace v3.0")
+        frappe.log_error(frappe.get_traceback(), "AMP Workspace v4.0")
         print(f"❌ {e}")

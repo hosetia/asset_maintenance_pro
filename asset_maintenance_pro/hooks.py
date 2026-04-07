@@ -70,12 +70,15 @@ app_include_js  = "/assets/asset_maintenance_pro/js/asset_maintenance_pro.js"
 app_include_css = "/assets/asset_maintenance_pro/css/asset_maintenance_pro.css"
 
 doctype_js = {
-    "Maintenance Request":    "public/js/maintenance_request.js",
-    "Maintenance Work Order": "public/js/maintenance_work_order.js",
-    "Asset":                  "public/js/asset_custom.js",
+    "Maintenance Request":         "public/js/maintenance_request.js",
+    "Maintenance Work Order":      "public/js/maintenance_work_order.js",
+    "Asset":                       "public/js/asset_custom.js",
+    "Maintenance BOM":             "public/js/maintenance_bom.js",
+    "Maintenance Technical Manual":"public/js/maintenance_technical_manual.js",
 }
 
 # ── Report fixtures ───────────────────────────────────────────────────────────
 fixtures += [
     {"dt": "Report", "filters": [["module", "=", "Asset Maintenance"]]},
+    {"dt": "Custom Field", "filters": [["module", "=", "Asset Maintenance"]]},
 ]
