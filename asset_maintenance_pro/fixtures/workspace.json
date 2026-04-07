@@ -2,72 +2,60 @@
  {
   "doctype": "Workspace",
   "name": "Asset Maintenance Pro",
-  "title": "Asset Maintenance",
+  "label": "Asset Maintenance",
   "module": "Asset Maintenance",
   "category": "Modules",
   "icon": "tool",
   "color": "#2490EF",
   "is_standard": 0,
   "public": 1,
-  "roles": [],
+  "sequence_id": 99.0,
+  "content": "[{\"type\":\"header\",\"data\":{\"text\":\"<h2>Asset Maintenance<\\/h2>\",\"col\":12}},{\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Maintenance Request\",\"col\":4}},{\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Maintenance Checklist\",\"col\":4}},{\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Work Logs\",\"col\":4}},{\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Spare Parts\",\"col\":4}},{\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Meter Readings\",\"col\":4}},{\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Settings\",\"col\":4}}]",
   "shortcuts": [
    {
-    "doctype": "Shortcut",
+    "doctype": "Workspace Shortcut",
     "label": "Maintenance Request",
     "link_to": "Maintenance Request",
     "type": "DocType",
-    "color": "#2490EF",
-    "icon": "tool"
+    "idx": 1
    },
    {
-    "doctype": "Shortcut",
-    "label": "New Request",
-    "link_to": "Maintenance Request",
-    "type": "DocType",
-    "color": "#28a745",
-    "icon": "add"
-   },
-   {
-    "doctype": "Shortcut",
+    "doctype": "Workspace Shortcut",
     "label": "Maintenance Checklist",
     "link_to": "Maintenance Checklist",
     "type": "DocType",
-    "color": "#6f42c1",
-    "icon": "list"
+    "idx": 2
    },
    {
-    "doctype": "Shortcut",
+    "doctype": "Workspace Shortcut",
     "label": "Work Logs",
     "link_to": "Maintenance Work Log",
     "type": "DocType",
-    "color": "#fd7e14",
-    "icon": "file"
+    "idx": 3
    },
    {
-    "doctype": "Shortcut",
+    "doctype": "Workspace Shortcut",
     "label": "Spare Parts",
     "link_to": "Spare Part Consumption",
     "type": "DocType",
-    "color": "#dc3545",
-    "icon": "stock"
+    "idx": 4
    },
    {
-    "doctype": "Shortcut",
+    "doctype": "Workspace Shortcut",
     "label": "Meter Readings",
     "link_to": "Asset Meter Reading",
     "type": "DocType",
-    "color": "#17a2b8",
-    "icon": "dashboard"
+    "idx": 5
    },
    {
-    "doctype": "Shortcut",
+    "doctype": "Workspace Shortcut",
     "label": "Settings",
     "link_to": "Asset Maintenance Settings",
     "type": "DocType",
-    "color": "#6c757d",
-    "icon": "setting"
+    "idx": 6
    }
   ],
-  "content": "[{\"type\":\"onboarding\",\"data\":{\"onboarding_name\":\"Asset Maintenance\",\"col\":12}},{\"type\":\"spacer\",\"data\":{\"col\":12}},{\"type\":\"header\",\"data\":{\"text\":\"<h3>Quick Access<\\/h3>\",\"col\":12}},{\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Maintenance Request\",\"col\":4}},{\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"New Request\",\"col\":4}},{\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Maintenance Checklist\",\"col\":4}},{\"type\":\"spacer\",\"data\":{\"col\":12}},{\"type\":\"header\",\"data\":{\"text\":\"<h3>Operations<\\/h3>\",\"col\":12}},{\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Work Logs\",\"col\":4}},{\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Spare Parts\",\"col\":4}},{\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Meter Readings\",\"col\":4}},{\"type\":\"spacer\",\"data\":{\"col\":12}},{\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Settings\",\"col\":4}}]"
+  "links": [],
+  "roles": []
  }
 ]
