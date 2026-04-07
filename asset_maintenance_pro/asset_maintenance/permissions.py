@@ -70,3 +70,32 @@ def has_maintenance_request_permission(doc, user=None, permission_type=None):
         return doc.assigned_to == user or None
 
     return False
+
+
+def work_order_query(user):
+    """
+    permission_query_conditions for Maintenance Work Order.
+    Branch Managers see their branch. Technicians see assigned work orders.
+    """
+    if not user:
+        user = frappe.session.user
+
+    roles = frappe.get_roles(user)
+
+    if "System Manager" in roles or "Maintenance Coordinator" in roles or user == "Administrator":
+        return ""
+
+    if "Branch Manager" in roles:
+        employee = frappe.db.get_value("Employee", {"user_id": user, "status": "Active"}, "branch")
+        if employee:
+            return "`tabMaintenance Work Order`.`branch` = {0}".format(
+                frappe.db.escape(employee)
+            )
+        return "1=0"
+
+    if "Maintenance Technician" in roles:
+        return "`tabMaintenance Work Order`.`lead_technician` = {0}".format(
+            frappe.db.escape(user)
+        )
+
+    return "1=0"
