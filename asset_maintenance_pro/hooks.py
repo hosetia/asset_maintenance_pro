@@ -13,7 +13,6 @@ fixtures = [
     {"dt": "Role", "filters": [["name", "in", ["Branch Manager", "Maintenance Technician"]]]},
     {"dt": "Custom Field", "filters": [["module", "=", "Asset Maintenance"]]},
     {"dt": "Workspace", "filters": [["name", "=", "Asset Maintenance Pro"]]},
-    {"dt": "Kanban Board", "filters": [["name", "=", "Maintenance Kanban"]]},
 ]
 
 # ─── Document Events ──────────────────────────────────────────────────────────
