@@ -1,0 +1,27 @@
+{
+ "doctype": "DocType",
+ "name": "Work Order Task",
+ "module": "Asset Maintenance",
+ "istable": 1,
+ "editable_grid": 1,
+ "engine": "InnoDB",
+ "field_order": [
+  "task","task_type","is_mandatory","completed","column_break_1",
+  "completed_by","completed_on","photo_before","photo_after","notes"
+ ],
+ "fields": [
+  {"fieldname":"task","fieldtype":"Data","label":"Task","reqd":1,"in_list_view":1},
+  {"fieldname":"task_type","fieldtype":"Select","label":"Type","in_list_view":1,
+   "options":"Before Work\nDuring Work\nAfter Work\nSafety Check"},
+  {"fieldname":"is_mandatory","fieldtype":"Check","label":"Mandatory","default":"0","in_list_view":1},
+  {"fieldname":"completed","fieldtype":"Check","label":"Done","default":"0","in_list_view":1},
+  {"fieldname":"column_break_1","fieldtype":"Column Break","label":""},
+  {"fieldname":"completed_by","fieldtype":"Link","label":"By","options":"User","read_only":1},
+  {"fieldname":"completed_on","fieldtype":"Datetime","label":"At","read_only":1},
+  {"fieldname":"photo_before","fieldtype":"Attach Image","label":"Photo Before"},
+  {"fieldname":"photo_after","fieldtype":"Attach Image","label":"Photo After"},
+  {"fieldname":"notes","fieldtype":"Small Text","label":"Notes"}
+ ],
+ "permissions": [],
+ "sort_field":"task_type","sort_order":"ASC","states":[]
+}

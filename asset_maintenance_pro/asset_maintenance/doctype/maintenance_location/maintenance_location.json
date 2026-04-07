@@ -1,0 +1,37 @@
+{
+ "doctype": "DocType",
+ "name": "Maintenance Location",
+ "module": "Asset Maintenance",
+ "is_tree": 1,
+ "naming_rule": "By Fieldname",
+ "autoname": "field:location_name",
+ "title_field": "location_name",
+ "search_fields": "location_name,location_type,parent_location",
+ "track_changes": 1,
+ "engine": "InnoDB",
+ "field_order": [
+  "location_name","location_type","parent_location","column_break_1",
+  "branch","is_active","section_details","address","area_type","notes"
+ ],
+ "fields": [
+  {"fieldname":"location_name","fieldtype":"Data","label":"Location Name","reqd":1,"in_list_view":1},
+  {"fieldname":"location_type","fieldtype":"Select","label":"Type",
+   "options":"Zone\nCity\nBranch\nArea","reqd":1,"in_list_view":1,"in_standard_filter":1},
+  {"fieldname":"parent_location","fieldtype":"Link","label":"Parent Location",
+   "options":"Maintenance Location","in_list_view":1},
+  {"fieldname":"column_break_1","fieldtype":"Column Break","label":""},
+  {"fieldname":"branch","fieldtype":"Link","label":"Branch","options":"Branch","in_standard_filter":1},
+  {"fieldname":"is_active","fieldtype":"Check","label":"Active","default":"1"},
+  {"fieldname":"section_details","fieldtype":"Section Break","label":"Details"},
+  {"fieldname":"address","fieldtype":"Small Text","label":"Address"},
+  {"fieldname":"area_type","fieldtype":"Select","label":"Area Type",
+   "options":"\nKitchen\nStorage\nDining Hall\nRooftop\nElectrical Room\nCold Room\nOffice\nExternal"},
+  {"fieldname":"notes","fieldtype":"Small Text","label":"Notes"}
+ ],
+ "permissions": [
+  {"role":"System Manager","read":1,"write":1,"create":1,"delete":1},
+  {"role":"Branch Manager","read":1,"write":0,"create":0,"delete":0},
+  {"role":"Maintenance Technician","read":1,"write":0,"create":0,"delete":0}
+ ],
+ "sort_field":"location_name","sort_order":"ASC","states":[]
+}

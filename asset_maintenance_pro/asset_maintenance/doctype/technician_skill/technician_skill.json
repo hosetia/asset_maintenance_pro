@@ -1,0 +1,21 @@
+{
+ "doctype": "DocType",
+ "name": "Technician Skill",
+ "module": "Asset Maintenance",
+ "istable": 1,
+ "engine": "InnoDB",
+ "field_order": ["skill","skill_level","certified","certification_no","expiry_date"],
+ "fields": [
+  {"fieldname":"skill","fieldtype":"Select","label":"Skill","reqd":1,"in_list_view":1,
+   "options":"HVAC\nRefrigeration\nElectrical\nPlumbing\nGas\nFire Safety\nIT\nCooking Equipment\nCivil\nGeneral"},
+  {"fieldname":"skill_level","fieldtype":"Select","label":"Level","reqd":1,"in_list_view":1,
+   "options":"Beginner\nIntermediate\nSenior\nExpert"},
+  {"fieldname":"certified","fieldtype":"Check","label":"Certified","default":"0"},
+  {"fieldname":"certification_no","fieldtype":"Data","label":"Cert. No.",
+   "depends_on":"eval:doc.certified==1"},
+  {"fieldname":"expiry_date","fieldtype":"Date","label":"Expiry",
+   "depends_on":"eval:doc.certified==1"}
+ ],
+ "permissions": [],
+ "sort_field":"skill","sort_order":"ASC","states":[]
+}

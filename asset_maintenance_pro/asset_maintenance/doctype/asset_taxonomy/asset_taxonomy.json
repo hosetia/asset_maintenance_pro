@@ -1,0 +1,33 @@
+{
+ "doctype": "DocType",
+ "name": "Asset Taxonomy",
+ "module": "Asset Maintenance",
+ "naming_rule": "By Fieldname",
+ "autoname": "field:code",
+ "title_field": "description",
+ "search_fields": "code,description,taxonomy_type,asset_category",
+ "track_changes": 0,
+ "engine": "InnoDB",
+ "field_order": [
+  "code","taxonomy_type","asset_category","column_break_1","description","failure_class","is_active"
+ ],
+ "fields": [
+  {"fieldname":"code","fieldtype":"Data","label":"Code","reqd":1,"in_list_view":1,"unique":1},
+  {"fieldname":"taxonomy_type","fieldtype":"Select","label":"Type",
+   "options":"Symptom\nCause\nRemedy\nFailure Class","reqd":1,"in_list_view":1,"in_standard_filter":1},
+  {"fieldname":"asset_category","fieldtype":"Link","label":"Asset Category",
+   "options":"Asset Category","in_standard_filter":1},
+  {"fieldname":"column_break_1","fieldtype":"Column Break","label":""},
+  {"fieldname":"description","fieldtype":"Data","label":"Description","reqd":1,"in_list_view":1},
+  {"fieldname":"failure_class","fieldtype":"Select","label":"Failure Class",
+   "options":"\nElectrical\nMechanical\nOperational\nCleaning\nExternal\nAge/Wear\nMisuse",
+   "depends_on":"eval:doc.taxonomy_type=='Failure Class'"},
+  {"fieldname":"is_active","fieldtype":"Check","label":"Active","default":"1"}
+ ],
+ "permissions": [
+  {"role":"System Manager","read":1,"write":1,"create":1,"delete":1},
+  {"role":"Branch Manager","read":1,"write":0,"create":0,"delete":0},
+  {"role":"Maintenance Technician","read":1,"write":0,"create":0,"delete":0}
+ ],
+ "sort_field":"taxonomy_type","sort_order":"ASC","states":[]
+}

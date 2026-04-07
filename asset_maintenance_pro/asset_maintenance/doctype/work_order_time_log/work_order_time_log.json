@@ -1,0 +1,23 @@
+{
+ "doctype": "DocType",
+ "name": "Work Order Time Log",
+ "module": "Asset Maintenance",
+ "istable": 1,
+ "editable_grid": 1,
+ "engine": "InnoDB",
+ "field_order": [
+  "technician","activity","from_time","to_time","hours","travel_hours","notes"
+ ],
+ "fields": [
+  {"fieldname":"technician","fieldtype":"Link","label":"Technician","options":"User","reqd":1,"in_list_view":1},
+  {"fieldname":"activity","fieldtype":"Select","label":"Activity","in_list_view":1,
+   "options":"Diagnosis\nRepair\nTesting\nPM Task\nTravel\nWaiting"},
+  {"fieldname":"from_time","fieldtype":"Datetime","label":"Start","reqd":1,"in_list_view":1},
+  {"fieldname":"to_time","fieldtype":"Datetime","label":"End","in_list_view":1},
+  {"fieldname":"hours","fieldtype":"Float","label":"Hours","read_only":1,"in_list_view":1},
+  {"fieldname":"travel_hours","fieldtype":"Float","label":"Travel (h)"},
+  {"fieldname":"notes","fieldtype":"Small Text","label":"Notes"}
+ ],
+ "permissions": [],
+ "sort_field":"from_time","sort_order":"ASC","states":[]
+}

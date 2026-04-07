@@ -1,0 +1,61 @@
+{
+ "doctype": "DocType",
+ "name": "Service Contract",
+ "module": "Asset Maintenance",
+ "naming_rule": "By Naming Series",
+ "autoname": "naming_series:",
+ "title_field": "contract_name",
+ "track_changes": 1,
+ "engine": "InnoDB",
+ "field_order": [
+  "naming_series","contract_name","vendor","contract_type","column_break_1",
+  "status","branch","start_date","end_date",
+  "section_sla","response_time_hours","repair_time_hours","included_visits_per_year",
+  "penalty_per_hour","column_break_sla","coverage_details","asset_categories_covered",
+  "section_financials","annual_value","currency","po_reference",
+  "section_visits","visits_used","visits_remaining","last_visit_date",
+  "section_alerts","renewal_reminder_days","alert_sent"
+ ],
+ "fields": [
+  {"fieldname":"naming_series","fieldtype":"Select","label":"Series","options":"SC-.YYYY.-.#####"},
+  {"fieldname":"contract_name","fieldtype":"Data","label":"Contract Name","reqd":1,"in_list_view":1},
+  {"fieldname":"vendor","fieldtype":"Link","label":"Vendor","options":"Supplier","reqd":1,"in_list_view":1,"in_standard_filter":1},
+  {"fieldname":"contract_type","fieldtype":"Select","label":"Type","in_list_view":1,
+   "options":"HVAC\nRefrigeration\nFire Safety\nGas\nPest Control\nIT\nElevator\nGeneral"},
+  {"fieldname":"column_break_1","fieldtype":"Column Break","label":""},
+  {"fieldname":"status","fieldtype":"Select","label":"Status","in_list_view":1,"in_standard_filter":1,
+   "options":"Draft\nActive\nExpiring Soon\nExpired\nCancelled","default":"Draft"},
+  {"fieldname":"branch","fieldtype":"Link","label":"Branch","options":"Branch","in_standard_filter":1},
+  {"fieldname":"start_date","fieldtype":"Date","label":"Start Date","reqd":1},
+  {"fieldname":"end_date","fieldtype":"Date","label":"End Date","reqd":1},
+  {"fieldname":"section_sla","fieldtype":"Section Break","label":"SLA Terms"},
+  {"fieldname":"response_time_hours","fieldtype":"Float","label":"Response Time (hrs)"},
+  {"fieldname":"repair_time_hours","fieldtype":"Float","label":"Repair Time (hrs)"},
+  {"fieldname":"included_visits_per_year","fieldtype":"Int","label":"Included Visits/Year"},
+  {"fieldname":"penalty_per_hour","fieldtype":"Currency","label":"Penalty/Hour Delay"},
+  {"fieldname":"column_break_sla","fieldtype":"Column Break","label":""},
+  {"fieldname":"coverage_details","fieldtype":"Text Editor","label":"Coverage Details"},
+  {"fieldname":"asset_categories_covered","fieldtype":"Data","label":"Asset Categories Covered"},
+  {"fieldname":"section_financials","fieldtype":"Section Break","label":"Financials"},
+  {"fieldname":"annual_value","fieldtype":"Currency","label":"Annual Value"},
+  {"fieldname":"currency","fieldtype":"Link","label":"Currency","options":"Currency"},
+  {"fieldname":"po_reference","fieldtype":"Link","label":"Purchase Order","options":"Purchase Order"},
+  {"fieldname":"section_visits","fieldtype":"Section Break","label":"Visit Tracking"},
+  {"fieldname":"visits_used","fieldtype":"Int","label":"Visits Used","read_only":1,"default":"0"},
+  {"fieldname":"visits_remaining","fieldtype":"Int","label":"Visits Remaining","read_only":1},
+  {"fieldname":"last_visit_date","fieldtype":"Date","label":"Last Visit","read_only":1},
+  {"fieldname":"section_alerts","fieldtype":"Section Break","label":"Alerts"},
+  {"fieldname":"renewal_reminder_days","fieldtype":"Int","label":"Remind Before Expiry (Days)","default":"30"},
+  {"fieldname":"alert_sent","fieldtype":"Check","label":"Renewal Alert Sent","read_only":1}
+ ],
+ "permissions": [
+  {"role":"System Manager","read":1,"write":1,"create":1,"delete":1},
+  {"role":"Branch Manager","read":1,"write":0,"create":0,"delete":0}
+ ],
+ "states": [
+  {"color":"Gray","title":"Draft"},{"color":"Green","title":"Active"},
+  {"color":"Orange","title":"Expiring Soon"},{"color":"Red","title":"Expired"},
+  {"color":"Gray","title":"Cancelled"}
+ ],
+ "sort_field":"end_date","sort_order":"ASC"
+}
