@@ -47,7 +47,7 @@ CONTENT = json.dumps([
 SHORTCUTS = [
     # Quick actions (row 1)
     ("طلب صيانة جديد",  "Maintenance Request",          "DocType", 1,  "#28a745"),
-    ("لوحة التحكم",      "/app/maintenance-dashboard",   "URL",     2,  "#6f42c1"),
+    ("لوحة التحكم",      "Maintenance Request",          "DocType", 2,  "#6f42c1"),
     ("Kanban",           "Maintenance Request",          "DocType", 3,  "#2490EF"),
     ("تقرير دوري",       "Maintenance Request",          "DocType", 4,  "#20c997"),
     ("تحليل TCO",        "Asset",                        "DocType", 5,  "#e83e8c"),
@@ -145,7 +145,7 @@ def execute():
                         link_to = "Maintenance Request"
                 row = {"label": label, "link_to": link_to, "type": stype, "idx": idx}
                 if "color" in sc_fields: row["color"] = color
-                if "url" in sc_fields and stype == "URL": row["url"] = link_to
+
                 ws.append("shortcuts", row)
 
         if "links" in field_names:
