@@ -12,7 +12,6 @@ required_apps = ["frappe", "erpnext"]
 fixtures = [
     {"dt": "Role", "filters": [["name", "in", ["Branch Manager", "Maintenance Technician"]]]},
     {"dt": "Custom Field", "filters": [["module", "=", "Asset Maintenance"]]},
-    {"dt": "Workspace", "filters": [["name", "=", "Asset Maintenance Pro"]]},
 ]
 
 # ─── Document Events ──────────────────────────────────────────────────────────
