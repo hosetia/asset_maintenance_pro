@@ -274,3 +274,129 @@ def send_overdue_notifications():
         except Exception:
             frappe.log_error(frappe.get_traceback(),
                              f"Overdue notification failed: {req.name}")
+
+
+# ══════════════════════════════════════════════════════════════════════════════
+# ASSET METRICS UPDATE (MTTR / MTBF)
+# ══════════════════════════════════════════════════════════════════════════════
+
+def update_asset_metrics():
+    """Daily: recalculate MTTR and MTBF for all assets with work orders."""
+    assets = frappe.get_all("Asset", pluck="name")
+    for asset in assets:
+        try:
+            _recalc_asset_metrics(asset)
+        except Exception:
+            pass
+    frappe.db.commit()
+
+
+def _recalc_asset_metrics(asset):
+    rows = frappe.db.sql("""
+        SELECT COUNT(*) AS cnt,
+               SUM(COALESCE(downtime_hours,0)) AS total_downtime,
+               DATEDIFF(MAX(creation), MIN(creation)) AS span_days
+        FROM `tabMaintenance Work Order`
+        WHERE asset = %s AND status IN ('Completed','Closed') AND work_order_type='Corrective'
+    """, asset, as_dict=True)
+    if not rows or not rows[0].cnt:
+        return
+    r = rows[0]
+    cnt = r.cnt or 1
+    mttr = round(flt(r.total_downtime) / cnt, 2)
+    mtbf = round((r.span_days or 1) / cnt, 1)
+    frappe.db.set_value("Asset", asset, {
+        "custom_mttr_hours": mttr,
+        "custom_mtbf_days":  mtbf,
+    })
+
+
+# ══════════════════════════════════════════════════════════════════════════════
+# WARRANTY + CONTRACT EXPIRY CHECKS
+# ══════════════════════════════════════════════════════════════════════════════
+
+def check_warranty_expiry():
+    """Daily: alert for assets with warranty expiring in 30/60/90 days."""
+    from asset_maintenance_pro.asset_maintenance.notifications import _send_inapp, _send_email
+    thresholds = [30, 60, 90]
+    for days in thresholds:
+        expiring = frappe.db.sql(f"""
+            SELECT name, asset_name, branch, custom_warranty_end
+            FROM `tabAsset`
+            WHERE custom_warranty_end IS NOT NULL
+              AND DATEDIFF(custom_warranty_end, CURDATE()) = {days}
+        """, as_dict=True)
+        for asset in expiring:
+            subject = f"⚠️ Warranty expiring in {days} days: {asset.asset_name}"
+            message = f"<p>Asset <b>{asset.asset_name}</b> warranty expires on <b>{asset.custom_warranty_end}</b>.</p>"
+            managers = _get_branch_managers(asset.branch)
+            for user in managers:
+                _send_inapp(user, subject, message, frappe._dict({"name": asset.name, "doctype": "Asset"}))
+                _send_email(user, subject, message)
+
+
+def check_contract_expiry():
+    """Daily: check service contracts expiring soon."""
+    contracts = frappe.get_all("Service Contract",
+        filters={"status": ["in", ["Active", "Expiring Soon"]]},
+        fields=["name", "contract_name", "vendor", "end_date", "renewal_reminder_days", "alert_sent"]
+    )
+    for c in contracts:
+        days = date_diff(c.end_date, today())
+        threshold = c.renewal_reminder_days or 30
+        if 0 < days <= threshold and not c.alert_sent:
+            frappe.db.set_value("Service Contract", c.name, "status", "Expiring Soon")
+            frappe.db.set_value("Service Contract", c.name, "alert_sent", 1)
+
+
+# ══════════════════════════════════════════════════════════════════════════════
+# PM REMINDERS
+# ══════════════════════════════════════════════════════════════════════════════
+
+def send_pm_reminders():
+    """Daily: send weekly PM plan reminder."""
+    from frappe.utils import get_weekday
+    if get_weekday() != "Sunday":
+        return  # Only send on Sundays
+    upcoming = frappe.get_all("Maintenance Request",
+        filters={
+            "request_type": "Preventive (Auto-generated)",
+            "status": ["in", ["New", "Assigned"]],
+            "due_date": ["between", [today(), add_days(today(), 7)]],
+        },
+        fields=["name", "asset", "branch", "due_date", "assigned_to"]
+    )
+    if not upcoming:
+        return
+    from asset_maintenance_pro.asset_maintenance.notifications import _send_email
+    msg = "<p>Upcoming PM tasks this week:</p><ul>"
+    for r in upcoming:
+        msg += f"<li>{r.asset} — Due: {r.due_date} — {r.name}</li>"
+    msg += "</ul>"
+    subject = f"📋 {len(upcoming)} PM tasks due this week"
+    # Send to all coordinators/managers
+    users = frappe.get_all("User",
+        filters={"enabled": 1, "name": ["in",
+            frappe.db.sql("SELECT DISTINCT parent FROM `tabHas Role` WHERE role IN ('Branch Manager','Maintenance Coordinator')", pluck=True)
+        ]},
+        pluck="name", limit=20
+    )
+    for user in users:
+        try:
+            _send_email(user, subject, msg)
+        except Exception:
+            pass
+
+
+def _get_branch_managers(branch):
+    if not branch:
+        return []
+    employees = frappe.get_all("Employee",
+        filters={"branch": branch, "status": "Active"},
+        pluck="user_id"
+    )
+    managers = []
+    for uid in employees:
+        if uid and "Branch Manager" in frappe.get_roles(uid):
+            managers.append(uid)
+    return managers

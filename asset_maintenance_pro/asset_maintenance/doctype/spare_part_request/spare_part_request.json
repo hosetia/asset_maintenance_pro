@@ -1,0 +1,60 @@
+{
+ "doctype": "DocType",
+ "name": "Spare Part Request",
+ "module": "Asset Maintenance",
+ "naming_rule": "By Naming Series",
+ "autoname": "naming_series:",
+ "title_field": "name",
+ "track_changes": 1,
+ "engine": "InnoDB",
+ "field_order": [
+  "naming_series","maintenance_request","work_order","branch","column_break_1",
+  "status","urgency","requested_by","request_date",
+  "section_items","items",
+  "section_fulfillment","fulfillment_type","warehouse","purchase_order",
+  "column_break_fulfill","approved_by","approved_on","issued_on","total_amount",
+  "section_notes","notes"
+ ],
+ "fields": [
+  {"fieldname":"naming_series","fieldtype":"Select","label":"Series","options":"SPR-.YYYY.-.#####"},
+  {"fieldname":"maintenance_request","fieldtype":"Link","label":"Maintenance Request","options":"Maintenance Request","in_list_view":1},
+  {"fieldname":"work_order","fieldtype":"Link","label":"Work Order","options":"Maintenance Work Order"},
+  {"fieldname":"branch","fieldtype":"Link","label":"Branch","options":"Branch","in_list_view":1,"in_standard_filter":1},
+  {"fieldname":"column_break_1","fieldtype":"Column Break","label":""},
+  {"fieldname":"status","fieldtype":"Select","label":"Status","in_list_view":1,
+   "options":"Draft\nPending Approval\nApproved\nIssued from Stock\nPurchase Required\nDelivered\nCancelled",
+   "default":"Draft"},
+  {"fieldname":"urgency","fieldtype":"Select","label":"Urgency","in_list_view":1,
+   "options":"Normal\nUrgent\nCritical","default":"Normal"},
+  {"fieldname":"requested_by","fieldtype":"Link","label":"Requested By","options":"User","default":"__user","read_only":1},
+  {"fieldname":"request_date","fieldtype":"Date","label":"Date","default":"Today"},
+  {"fieldname":"section_items","fieldtype":"Section Break","label":"Requested Parts"},
+  {"fieldname":"items","fieldtype":"Table","label":"Items","options":"Spare Part Request Item"},
+  {"fieldname":"section_fulfillment","fieldtype":"Section Break","label":"Fulfillment"},
+  {"fieldname":"fulfillment_type","fieldtype":"Select","label":"Fulfill From",
+   "options":"\nWarehouse Stock\nPurchase","depends_on":"eval:doc.status=='Approved'"},
+  {"fieldname":"warehouse","fieldtype":"Link","label":"Warehouse","options":"Warehouse",
+   "depends_on":"eval:doc.fulfillment_type=='Warehouse Stock'"},
+  {"fieldname":"purchase_order","fieldtype":"Link","label":"Purchase Order","options":"Purchase Order",
+   "depends_on":"eval:doc.fulfillment_type=='Purchase'"},
+  {"fieldname":"column_break_fulfill","fieldtype":"Column Break","label":""},
+  {"fieldname":"approved_by","fieldtype":"Link","label":"Approved By","options":"User","read_only":1},
+  {"fieldname":"approved_on","fieldtype":"Datetime","label":"Approved On","read_only":1},
+  {"fieldname":"issued_on","fieldtype":"Datetime","label":"Issued On","read_only":1},
+  {"fieldname":"total_amount","fieldtype":"Currency","label":"Total Amount","read_only":1},
+  {"fieldname":"section_notes","fieldtype":"Section Break","label":"Notes"},
+  {"fieldname":"notes","fieldtype":"Text Editor","label":"Notes"}
+ ],
+ "permissions": [
+  {"role":"System Manager","read":1,"write":1,"create":1,"delete":1},
+  {"role":"Branch Manager","read":1,"write":1,"create":1,"delete":0},
+  {"role":"Maintenance Technician","read":1,"write":1,"create":1,"delete":0}
+ ],
+ "states": [
+  {"color":"Gray","title":"Draft"},{"color":"Orange","title":"Pending Approval"},
+  {"color":"Green","title":"Approved"},{"color":"Blue","title":"Issued from Stock"},
+  {"color":"Yellow","title":"Purchase Required"},{"color":"Green","title":"Delivered"},
+  {"color":"Red","title":"Cancelled"}
+ ],
+ "sort_field":"request_date","sort_order":"DESC"
+}

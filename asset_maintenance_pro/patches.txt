@@ -5,3 +5,5 @@ asset_maintenance_pro.patches.v1_0.create_default_settings
 asset_maintenance_pro.patches.v1_0.create_kanban_board
 asset_maintenance_pro.patches.v1_0.create_workspace
 asset_maintenance_pro.patches.v1_0.create_default_sla_policies
+asset_maintenance_pro.patches.v1_0.create_default_taxonomy
+asset_maintenance_pro.patches.v1_0.create_extra_roles

@@ -1,0 +1,22 @@
+{
+ "doctype": "DocType",
+ "name": "Inspection Item",
+ "module": "Asset Maintenance",
+ "istable": 1,
+ "editable_grid": 1,
+ "engine": "InnoDB",
+ "field_order": ["checkpoint","standard","result","reading","column_break_1","remarks","photo","is_critical"],
+ "fields": [
+  {"fieldname":"checkpoint","fieldtype":"Data","label":"Checkpoint","reqd":1,"in_list_view":1},
+  {"fieldname":"standard","fieldtype":"Data","label":"Standard/Expected","in_list_view":1},
+  {"fieldname":"result","fieldtype":"Select","label":"Result","in_list_view":1,
+   "options":"\nPass\nFail\nN/A\nObservation"},
+  {"fieldname":"reading","fieldtype":"Data","label":"Reading/Value","in_list_view":1},
+  {"fieldname":"column_break_1","fieldtype":"Column Break","label":""},
+  {"fieldname":"remarks","fieldtype":"Small Text","label":"Remarks"},
+  {"fieldname":"photo","fieldtype":"Attach Image","label":"Photo"},
+  {"fieldname":"is_critical","fieldtype":"Check","label":"Critical","default":"0"}
+ ],
+ "permissions": [],
+ "sort_field":"idx","sort_order":"ASC","states":[]
+}
