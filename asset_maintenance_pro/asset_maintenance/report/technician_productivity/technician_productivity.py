@@ -1,6 +1,3 @@
-import frappe
-from frappe.utils import flt
-
 def execute(filters=None):
     filters = filters or {}
     columns = [
@@ -11,6 +8,7 @@ def execute(filters=None):
         {"label":"Open Jobs","fieldname":"open_jobs","fieldtype":"Int","width":100},
         {"label":"Overdue Jobs","fieldname":"overdue_jobs","fieldtype":"Int","width":110},
     ]
+
     rows = frappe.db.sql("""
         SELECT tl.technician,
                COUNT(DISTINCT wo.name) AS jobs_completed,
@@ -37,16 +35,9 @@ def execute(filters=None):
         data.append({
             "technician": r.technician,
             "jobs_completed": r.jobs_completed,
-            "total_hours": round(flt(r.total_hours), 2),
-            "avg_hours": round(flt(r.avg_hours), 2),
+            "total_hours": round(float(r.total_hours or 0), 2),
+            "avg_hours": round(float(r.avg_hours or 0), 2),
             "open_jobs": open_j,
             "overdue_jobs": overdue_j,
         })
     return columns, data
-
-def get_filters():
-    return [
-        {"label":"From Date","fieldname":"from_date","fieldtype":"Date"},
-        {"label":"To Date","fieldname":"to_date","fieldtype":"Date"},
-        {"label":"Branch","fieldname":"branch","fieldtype":"Link","options":"Branch"},
-    ]

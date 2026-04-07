@@ -1,6 +1,3 @@
-import frappe
-from frappe.utils import flt
-
 def execute(filters=None):
     filters = filters or {}
     columns = [
@@ -12,9 +9,10 @@ def execute(filters=None):
         {"label":"Cumulative %","fieldname":"cumulative_pct","fieldtype":"Float","width":120},
         {"label":"Total Downtime (hrs)","fieldname":"total_downtime","fieldtype":"Float","width":150},
     ]
+
     rows = frappe.db.sql("""
-        SELECT COALESCE(wo.symptom_code, 'Unknown') AS symptom,
-               COALESCE(wo.failure_class, 'Unknown') AS failure_class,
+        SELECT COALESCE(wo.symptom_code,'Unknown') AS symptom,
+               COALESCE(wo.failure_class,'Unknown') AS failure_class,
                COUNT(*) AS cnt,
                SUM(COALESCE(wo.downtime_hours,0)) AS total_downtime
         FROM `tabMaintenance Work Order` wo
@@ -31,20 +29,9 @@ def execute(filters=None):
         pct = round(r.cnt / total * 100, 1)
         cumulative += pct
         data.append({
-            "rank": i,
-            "symptom": r.symptom,
-            "failure_class": r.failure_class,
-            "count": r.cnt,
-            "pct": pct,
+            "rank": i, "symptom": r.symptom, "failure_class": r.failure_class,
+            "count": r.cnt, "pct": pct,
             "cumulative_pct": round(cumulative, 1),
-            "total_downtime": round(flt(r.total_downtime), 2),
+            "total_downtime": round(float(r.total_downtime or 0), 2),
         })
     return columns, data
-
-def get_filters():
-    return [
-        {"label":"Branch","fieldname":"branch","fieldtype":"Link","options":"Branch"},
-        {"label":"Asset Category","fieldname":"asset_category","fieldtype":"Link","options":"Asset Category"},
-        {"label":"From Date","fieldname":"from_date","fieldtype":"Date"},
-        {"label":"To Date","fieldname":"to_date","fieldtype":"Date"},
-    ]

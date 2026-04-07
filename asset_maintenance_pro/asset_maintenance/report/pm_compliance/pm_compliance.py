@@ -1,6 +1,3 @@
-import frappe
-from frappe.utils import flt
-
 def execute(filters=None):
     filters = filters or {}
     columns = [
@@ -12,19 +9,25 @@ def execute(filters=None):
         {"label":"Compliance %","fieldname":"compliance_pct","fieldtype":"Float","width":120},
         {"label":"Avg Days Late","fieldname":"avg_days_late","fieldtype":"Float","width":120},
     ]
+
+    branch_filter = ""
+    if filters.get("branch"):
+        branch_filter = "AND mr.branch = %(branch)s"
+
     rows = frappe.db.sql("""
         SELECT mr.branch, a.asset_category,
                COUNT(*) AS planned,
                SUM(IF(mr.status='Completed',1,0)) AS completed,
-               SUM(IF(mr.status NOT IN ('Completed','Cancelled') AND mr.due_date < CURDATE(),1,0)) AS overdue,
+               SUM(IF(mr.status NOT IN ('Completed','Cancelled')
+                   AND mr.due_date < CURDATE(),1,0)) AS overdue,
                AVG(IF(mr.status='Completed' AND mr.due_date IS NOT NULL,
-                   DATEDIFF(mr.modified, mr.due_date), NULL)) AS avg_days_late
+                   DATEDIFF(DATE(mr.modified), mr.due_date), NULL)) AS avg_days_late
         FROM `tabMaintenance Request` mr
         LEFT JOIN `tabAsset` a ON a.name = mr.asset
         WHERE mr.request_type = 'Preventive (Auto-generated)'
-          {f}
+          {branch_filter}
         GROUP BY mr.branch, a.asset_category
-    """.format(f=f"AND mr.branch='{filters['branch']}'" if filters.get("branch") else ""), as_dict=True)
+    """.format(branch_filter=branch_filter), filters, as_dict=True)
 
     data = []
     for r in rows:
@@ -37,14 +40,7 @@ def execute(filters=None):
             "completed": comp,
             "overdue": r.overdue or 0,
             "compliance_pct": round(comp / planned * 100, 1),
-            "avg_days_late": round(flt(r.avg_days_late), 1),
+            "avg_days_late": round(float(r.avg_days_late or 0), 1),
         })
     data.sort(key=lambda x: x["compliance_pct"])
     return columns, data
-
-def get_filters():
-    return [
-        {"label":"Branch","fieldname":"branch","fieldtype":"Link","options":"Branch"},
-        {"label":"From Date","fieldname":"from_date","fieldtype":"Date"},
-        {"label":"To Date","fieldname":"to_date","fieldtype":"Date"},
-    ]
