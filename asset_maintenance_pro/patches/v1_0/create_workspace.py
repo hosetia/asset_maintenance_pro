@@ -35,7 +35,6 @@ CONTENT = json.dumps([
     {"type":"header","data":{"text":"<h4>🧠 المعرفة</h4>","col":12}},
     {"type":"shortcut","data":{"shortcut_name":"قاعدة المعرفة","col":3}},
     {"type":"shortcut","data":{"shortcut_name":"تصنيف الأعطال","col":3}},
-    {"type":"shortcut","data":{"shortcut_name":"BOM الصيانة","col":3}},
     {"type":"shortcut","data":{"shortcut_name":"تحليل TCO","col":3}},
 ])
 
@@ -131,7 +130,7 @@ def execute():
                 ("الأدلة التقنية",   "Maintenance Technical Manual",     "DocType", 18, "#fd7e14"),
                 ("قاعدة المعرفة",    "Maintenance Knowledge Base",       "DocType", 19, "#6610f2"),
                 ("تصنيف الأعطال",   "Asset Taxonomy",                   "DocType", 20, "#6c757d"),
-                ("BOM الصيانة",      "Maintenance BOM",                  "DocType", 21, "#20c997"),
+
                 ("تحليل TCO",        "Asset",                            "DocType", 22, "#e83e8c"),
             ]
 
@@ -148,11 +147,14 @@ def execute():
             lk_meta   = frappe.get_meta("Workspace Link")
             lk_fields = {f.fieldname for f in lk_meta.fields}
             for group in LINKS:
+                valid_items = [
+                    item for item in group["items"]
+                    if frappe.db.exists("DocType", item["name"])
+                ]
+                if not valid_items:
+                    continue
                 ws.append("links", {"type":"Card Break","label":group["label"],"hidden":0})
-                for item in group["items"]:
-                    # Validate DocType exists before adding
-                    if not frappe.db.exists("DocType", item["name"]):
-                        continue
+                for item in valid_items:
                     row = {"type":"Link","hidden":0}
                     if "link_to" in lk_fields: row["link_to"] = item["name"]
                     if "label"   in lk_fields: row["label"]   = item["label"]
