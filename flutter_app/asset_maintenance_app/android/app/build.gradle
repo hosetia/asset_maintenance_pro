@@ -5,7 +5,7 @@ plugins {
 }
 
 android {
-    namespace = "com.assetmaintenance.asset_maintenance_app"
+    namespace = "com.example.asset_maintenance_app"
     compileSdkVersion 34
 
     compileOptions {
@@ -22,7 +22,7 @@ android {
     }
 
     defaultConfig {
-        applicationId "com.assetmaintenance.asset_maintenance_app"
+        applicationId "com.example.asset_maintenance_app"
         minSdkVersion 21
         targetSdkVersion 34
         versionCode flutterVersionCode.toInteger()

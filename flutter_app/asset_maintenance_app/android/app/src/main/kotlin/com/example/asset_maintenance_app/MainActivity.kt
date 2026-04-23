@@ -1,4 +1,4 @@
-package com.assetmaintenance.asset_maintenance_app
+package com.example.asset_maintenance_app
 
 import io.flutter.embedding.android.FlutterActivity
 
