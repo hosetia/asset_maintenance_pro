@@ -1,9 +1,0 @@
-{
-  "name": "Asset Maintenance Pro",
-  "short_name": "Asset Maintenance",
-  "description": "Professional Asset Maintenance Application",
-  "start_url": "./",
-  "display": "standalone",
-  "theme_color": "#1976d2",
-  "background_color": "#ffffff"
-}

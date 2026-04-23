@@ -17,10 +17,6 @@ android {
         jvmTarget = '1.8'
     }
 
-    sourceSets {
-        main.java.srcDirs += 'src/main/kotlin'
-    }
-
     defaultConfig {
         applicationId "com.example.asset_maintenance_app"
         minSdkVersion 21
@@ -38,8 +34,4 @@ android {
 
 flutter {
     source = "../.."
-}
-
-dependencies {
-    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
 }
