@@ -1,0 +1,63 @@
+# Flutter
+.dart_tool/
+.flutter-plugins
+.flutter-plugins-dependencies
+.packages
+.pub/
+build/
+.gradle/
+android/.gradle
+android/local.properties
+android/**/GeneratedPluginRegistrant.java
+.DS_Store
+ios/.gitignore
+ios/**/*.pbxuser
+ios/**/*.mode1v3
+ios/**/*.mode2v3
+ios/**/*.moved-aside
+ios/**/*.perspectivev3
+ios/**/*sync/
+ios/**/.sconsign.dblite
+ios/**/.tags*
+ios/**/.vscode/*
+!ios/.vscode/settings.json
+!ios/.vscode/tasks.json
+!ios/.vscode/launch.json
+!ios/.vscode/extensions.json
+ios/Flutter/Flutter.podspec
+ios/Flutter/Flutter.framework
+ios/Flutter/Flutter.xcframework
+ios/Flutter/generated.xcconfig
+ios/Flutter/ephemeral/
+ios/Flutter/app.flx
+ios/Flutter/app.zip
+ios/Flutter/flutter_assets/
+ios/Flutter/flutter_export_environment.sh
+ios/ServiceDefinitions.json
+ios/Runner/GeneratedPluginRegistrant.*
+
+# Environment
+.env
+.env.local
+.env.*.local
+
+# IDE
+.vscode/
+.idea/
+*.iml
+*.iws
+*.ipr
+.DS_Store
+
+# Miscellaneous
+*.class
+*.log
+*.pyc
+*.swp
+.atom/
+.buildlog/
+.history
+.svn/
+
+# Web-specific
+lib/generated_plugin_registrant.dart
